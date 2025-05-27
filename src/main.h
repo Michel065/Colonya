@@ -9,9 +9,10 @@
 #include <fstream>
 #include <vector>
 #include <random>
+#include <thread>
 
 #include "./Synchronisation/TimeManager.h"
 
-using namespace std;
+//using namespace std;
 
 #endif

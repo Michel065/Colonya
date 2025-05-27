@@ -2,37 +2,28 @@
 
 using namespace std;
 
+void creatureThread(TimeManager* tm) {
+    while (tm->status()) {
+        tm->waitNextTick();
+        std::cout << "Créature agit !" << std::endl;
+    }
+}
+
+
 int main() {
-    TimeManager timeManager(10);
+    TimeManager tm(2);
+
+    std::thread t1(creatureThread, &tm);
+    std::thread t2(creatureThread, &tm);
+    std::thread t3(creatureThread, &tm);
+
+    tm.start();  // Lance la boucle de ticks
+
+    t1.join();
+    t2.join();
+    t3.join();
 
     
     
     return 0;
-}
-
-#include "TimeManager.h"
-#include <iostream>
-
-int main() {
-    TimeManager timeManager(10); // 10 ticks par seconde
-
-    // Démarrer la gestion du temps
-    std::thread timeThread([&timeManager]() {
-        timeManager.start();
-    });
-
-    // Simulation principale, tu peux ajouter ici d'autres threads pour les créatures, la carte, etc.
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-
-    // Changer la vitesse de la simulation
-    timeManager.setTimeSpeed(30);  // Passer à 30 ticks par seconde pour accélérer
-
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-
-    // Stopper la simulation
-    timeManager.stop();
-
-    timeThread.join();  // Attendre que le thread de gestion du temps se termine
-
-    return 0;
-}
+}   

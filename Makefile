@@ -7,14 +7,14 @@ SFMLFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
 
 all: main
 
-# Compilation des fichiers objets
 build/main.o: src/main.cpp src/main.h
 	$(CXX) $(CXXFLAGS) -o build/main.o src/main.cpp
 
-# Compilation de l'exécutable final
-main: build/main.o 
-	$(CXX) -o main build/main.o $(SFMLFLAGS) 	
+build/TimeManager.o: src/Synchronisation/TimeManager.cpp src/Synchronisation/TimeManager.h
+	$(CXX) $(CXXFLAGS) -o build/TimeManager.o src/Synchronisation/TimeManager.cpp
 
-# Nettoyage des fichiers objets
+main: build/main.o build/TimeManager.o
+	$(CXX) -o main build/main.o build/TimeManager.o $(SFMLFLAGS) 	
+
 clean:
-	rm -f build/*.o build/simulation
+	rm -f build/*.o main
