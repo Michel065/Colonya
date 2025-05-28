@@ -1,29 +1,30 @@
-#include "main.h"   
+#include "main.h"    
 
-using namespace std;
+void start_Time_Manager(TimeManager &tm) {
+    // Lancer le gestionnaire de temps dans un thread séparé
+    std::thread timeThread([&tm]() {  // Utilisation de &tm pour passer par référence
+        tm.start();
+    });
 
-void creatureThread(TimeManager* tm) {
-    while (tm->status()) {
-        tm->waitNextTick();
-        std::cout << "Créature agit !" << std::endl;
-    }
+    timeThread.detach();  // Détacher le thread pour qu'il fonctionne en arrière-plan
 }
-
 
 int main() {
     TimeManager tm(2);
 
-    std::thread t1(creatureThread, &tm);
-    std::thread t2(creatureThread, &tm);
-    std::thread t3(creatureThread, &tm);
+    start_Time_Manager(tm);
 
-    tm.start();  // Lance la boucle de ticks
+    // Pendant que le thread fonctionne, on peut faire d'autres actions
+    for (int i = 0; i < 5; ++i) {
+        // Attendre chaque tick pour simuler une autre tâche
+        tm.waitNextTick();
+        std::cout << "Attente d'un nouveau tick..." << tm.get_date() << std::endl;
+    }
 
-    t1.join();
-    t2.join();
-    t3.join();
-
+    // Arrêter le gestionnaire de temps
+    tm.stop();
     
-    
+    std::cout << "Simulation terminée." << std::endl;
+
     return 0;
-}   
+}

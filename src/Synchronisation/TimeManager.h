@@ -1,19 +1,20 @@
 #ifndef _TIME_MANAGER_H
 #define _TIME_MANAGER_H 
 
-#include <condition_variable>
-#include <mutex>
-#include <atomic>
+#include "../includes.h"
 
 class TimeManager {
 private:
+    // 1 tick c 0.5 seconde reel donc le temps reel correspond a 2 tick par seconde
     std::atomic<bool> running;
     int ticksPerSecond;
+    unsigned long date=0;
+    unsigned long duree_simulation=100;
     std::chrono::milliseconds tickDuration;
     std::chrono::steady_clock::time_point lastTickTime;
-
     std::mutex mtx;
     std::condition_variable tickCV;
+
 
 public:
     TimeManager(int tps) : running(true),ticksPerSecond(tps) {
@@ -21,29 +22,29 @@ public:
     }
 
     void start() {
-        int x=0;
         lastTickTime = std::chrono::steady_clock::now();
-        while (running) {
+        while (running && date < duree_simulation) {
             auto now = std::chrono::steady_clock::now();
             std::chrono::milliseconds elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastTickTime);
             if (elapsedTime >= tickDuration) {
                 lastTickTime = now;
                 tick();
-                x++;
             } else {
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));  // Dormir si pas encore de tick
             }
-            if(x>10){stop();}
         }
+        stop();  // Arrêter la simulation une fois la durée atteinte
     }
 
     void stop() {
+        std::cout << "STOP Time Manager!" << std::endl;
         running = false;
         tickCV.notify_all();
     }
 
     void tick() {
-        std::cout << "Tick!" << std::endl;
+        //std::cout << "Tick!" << std::endl;
+        date++;
         tickCV.notify_all();
     }
 
@@ -59,6 +60,10 @@ public:
 
     bool status() {
         return running;
+    }
+
+    unsigned long get_date() {
+        return date;
     }
 };
 
