@@ -16,9 +16,23 @@
 #include <mutex>
 #include <atomic>
 #include <chrono>
+#include <string>
+#include <filesystem>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
+//using et namespace:
+namespace fs = std::filesystem;
 
-//namespace:
 //using namespace std;
+
+
+//fonction de base
+
+template<typename T>
+inline void print(const T& trucs) {
+    std::cout << trucs << std::endl;
+}
+
 
 #endif

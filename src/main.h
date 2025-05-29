@@ -3,6 +3,7 @@
 #include "includes.h"
 
 #include "./Synchronisation/TimeManager.h"
+#include "./map/MapManager.h"
 
 
 #endif

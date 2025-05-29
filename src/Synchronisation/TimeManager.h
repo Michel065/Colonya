@@ -4,6 +4,7 @@
 #include "../includes.h"
 
 class TimeManager {
+    
 private:
     // 1 tick c 0.5 seconde reel donc le temps reel correspond a 2 tick par seconde
     std::atomic<bool> running;
@@ -18,6 +19,10 @@ private:
 
 public:
     TimeManager(int tps) : running(true),ticksPerSecond(tps) {
+        /*
+        Cette class a pour role de creer un temps coherent entre nos thread et donc de les syncronisé on fais ca sous forme de tick
+        de cette maniere l'idée est de faire en sorte que la vitesse de notre simulation soit reglable.     
+        */
         tickDuration = std::chrono::milliseconds(1000 / ticksPerSecond);
     }
 
@@ -33,7 +38,7 @@ public:
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));  // Dormir si pas encore de tick
             }
         }
-        stop();  // Arrêter la simulation une fois la durée atteinte
+        if(date > duree_simulation){stop();}  // Arrêter la simulation une fois la durée atteinte
     }
 
     void stop() {
@@ -64,6 +69,17 @@ public:
 
     unsigned long get_date() {
         return date;
+    }
+
+    void wait_ticks(unsigned long ticks) {
+        wait_until(date + ticks);
+    }
+
+    void wait_until(unsigned long target_tick) {
+        std::unique_lock<std::mutex> lock(mtx);
+        tickCV.wait(lock, [&]() {
+            return date >= target_tick || !running;
+        });
     }
 };
 
