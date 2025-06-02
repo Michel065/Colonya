@@ -13,9 +13,25 @@ private:
 
 public:
     static void load_defaults();
-    static const Biome* get(const std::string& name);
-    static const std::vector<std::string> get_liste_biome();
+    static Biome* get(const std::string& name);
+    static std::vector<std::string> get_liste_biome();
 };
+
+
+//seriralisation de biome.h
+inline void to_json(json& j, Biome* b) {
+    if (b) {
+        j = json{{"biome", b->name}};
+    } else {
+        j = json{{"biome", "unknown"}};
+    }
+}
+
+inline void from_json(const json& j, Biome*& b) {
+    std::string name;
+    j.at("biome").get_to(name);
+    b = BiomeManager::get(name);
+}
 
 
 #endif

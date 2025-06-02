@@ -7,7 +7,7 @@ SFMLFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
 
 all: main
 
-build/main.o: src/main.cpp src/main.h src/Synchronisation/TimeManager.h src/includes.h src/map/MapManager.h
+build/main.o: src/main.cpp src/main.h src/Synchronisation/TimeManager.h src/includes.h src/map/MapManager.h src/map/Case.h
 	$(CXX) $(CXXFLAGS) -o build/main.o src/main.cpp
 
 build/mapmanager.o: src/map/MapManager.cpp src/map/MapManager.h src/map/Map.h src/Synchronisation/TimeManager.h src/map/MapContexte.h src/includes.h
@@ -16,10 +16,7 @@ build/mapmanager.o: src/map/MapManager.cpp src/map/MapManager.h src/map/Map.h sr
 build/mapcontextejson.o: src/map/serialization/MapContexteJson.cpp src/map/MapContexte.h 
 	$(CXX) $(CXXFLAGS) -o build/mapcontextejson.o src/map/serialization/MapContexteJson.cpp
 
-build/biomejson.o: src/map/serialization/BiomeJson.cpp src/map/Biome.h 
-	$(CXX) $(CXXFLAGS) -o build/biomejson.o src/map/serialization/BiomeJson.cpp
-
-build/BiomeManager.o: src/map/BiomeManager.cpp src/map/BiomeManager.h src/map/Biome.h
+build/BiomeManager.o: src/map/BiomeManager.cpp src/map/BiomeManager.h src/map/Biome.h src/map/Case.h
 	$(CXX) $(CXXFLAGS) -o build/BiomeManager.o src/map/BiomeManager.cpp
 
 build/includes.o: src/includes.cpp src/includes.h 

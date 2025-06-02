@@ -19,12 +19,12 @@ void BiomeManager::load_defaults() {
 
 }
 
-const Biome* BiomeManager::get(const std::string& name) {
+Biome* BiomeManager::get(const std::string& name) {
     auto it = biome_map.find(name);
     return (it != biome_map.end() ? &it->second : &unknown);
 }
 
-const std::vector<std::string> BiomeManager::get_liste_biome() {
+std::vector<std::string> BiomeManager::get_liste_biome() {
     std::vector<std::string> names;
     for (const auto& [name, biome] : biome_map) {
         names.push_back(name);

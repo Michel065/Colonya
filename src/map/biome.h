@@ -3,6 +3,9 @@
 
 #include "../includes.h"
 
+class BiomeManager;
+struct Case;
+
 struct Biome {
     std::string name;
     std::string texture;
@@ -15,6 +18,8 @@ struct Biome {
         if (evolution_logic) evolution_logic(c);
     }
 };
+
+//la seriralisation c dans le fichier biomemanager.h
 
 // Surcharge de l'opérateur <<
 inline std::ostream& operator<<(std::ostream& os, const Biome& biome) {
