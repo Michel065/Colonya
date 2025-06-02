@@ -37,9 +37,17 @@ int main() {
 
     BiomeManager::load_defaults();
 
-    const Biome* b1=BiomeManager::get("terre");
+    Biome* b1=BiomeManager::get("terre");
 
-    std::cout<<*b1<<std::endl;
+    Ressource re;
+    re.name=1;
+    Structure st;
+    st.name=34;
+    Case c1;
+    c1.set(b1,re,st);
+
+
+    std::cout<<c1<<std::endl;
 
     time_manager.stop();
     

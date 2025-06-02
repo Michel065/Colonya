@@ -7,7 +7,12 @@ struct MapContexte {
     std::vector<std::string> chuncks;
 };
 
-void to_json(json& j, const MapContexte& m);
-void from_json(const json& j, MapContexte& m);
+inline void to_json(json& j, const MapContexte& m) {
+    j = json{{"chuncks", m.chuncks}};
+}
+
+inline void from_json(const json& j, MapContexte& m) {
+    j.at("chuncks").get_to(m.chuncks);
+}
 
 #endif

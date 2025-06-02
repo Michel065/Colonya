@@ -18,4 +18,11 @@ inline void from_json(const json& j, Ressource& r) {
     j.at("name").get_to(r.name);
 }
 
+// Surcharge de l'opérateur <<
+inline std::ostream& operator<<(std::ostream& os, const Ressource& res) {
+    os << "[Ressource: " << res.name 
+       << "]";
+    return os;
+}
+
 #endif

@@ -38,7 +38,7 @@ public:
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));  // Dormir si pas encore de tick
             }
         }
-        if(date > duree_simulation){stop();}  // Arrêter la simulation une fois la durée atteinte
+        //if(date > duree_simulation){stop();}  // Arrêter la simulation une fois la durée atteinte
     }
 
     void stop() {

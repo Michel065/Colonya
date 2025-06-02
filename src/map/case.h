@@ -12,10 +12,16 @@ struct Case {
     Ressource ressource;
     Structure structure;
 
+    bool constructible=true;
+
+    void set(Biome* bio, Ressource re,Structure st){biome=bio;ressource=re;structure=st;}
     void update() {
         if (biome) biome->update(*this);
         ressource.update(*this);
         structure.update(*this);
+        
+        constructible=biome->contructible;// pas utile a revoir
+
     }
 };
 
@@ -32,6 +38,16 @@ inline void from_json(const json& j, Case& c) {
     j.at("biome").get_to(c.biome);
     j.at("ressource").get_to(c.ressource);
     j.at("structure").get_to(c.structure);
+}
+
+// Surcharge de l'opérateur <<
+inline std::ostream& operator<<(std::ostream& os, const Case& casde) {
+    os << "[Case: " 
+       << " | " << *casde.biome 
+       << " | " << casde.ressource
+       << " | " << casde.structure
+       << "]";
+    return os;
 }
 
 #endif
