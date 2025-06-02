@@ -11,7 +11,6 @@
 class MapManager {
 private:
     std::string name_map="";
-    std::string worlds_file="./src/worlds/";
     std::string world_contexte_name="contexte.json";
     std::string world_file;
     Map carte;

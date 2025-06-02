@@ -35,6 +35,11 @@ int main() {
 
     MapManager map_manager("001",time_manager);
 
+    BiomeManager::load_defaults();
+
+    const Biome* b1=BiomeManager::get("terre");
+
+    std::cout<<*b1<<std::endl;
 
     time_manager.stop();
     

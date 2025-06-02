@@ -18,8 +18,12 @@
 #include <chrono>
 #include <string>
 #include <filesystem>
+
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
+
+
+#include <unordered_map>
 
 //using et namespace:
 namespace fs = std::filesystem;
@@ -33,6 +37,11 @@ template<typename T>
 inline void print(const T& trucs) {
     std::cout << trucs << std::endl;
 }
+
+
+// def chemin;
+extern std::string textures_file;
+extern std::string worlds_file;
 
 
 #endif

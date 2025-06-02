@@ -5,7 +5,7 @@
 
 class Map {    
 private:
-    std::vector<int> chucks;
+    std::vector<int> chucks;    
     std::string name_map;
     
 

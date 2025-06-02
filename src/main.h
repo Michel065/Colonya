@@ -4,6 +4,7 @@
 
 #include "./Synchronisation/TimeManager.h"
 #include "./map/MapManager.h"
+#include "./map/BiomeManager.h"
 
 
 #endif
