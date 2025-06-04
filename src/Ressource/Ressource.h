@@ -4,10 +4,19 @@
 #include "../includes.h"
 struct Case;
 
+
+/*
+les ressource ne sont pas cumulable (ex:64) par contre elle on une quantité d'utilisation (ex: eau 20 utilisation)
+*/
+
 struct Ressource {
     int name;
+    //std::string nom_ressource;
+    //int quantite;
 
-    void update(Case& c) const;
+    void update(Case& c){}
+    //void consome(Creature c) ; comme ca ca modif direct les sta de la creature si c un buff ou de l'eau du mangé ... 
+    //quand cide s'autodetruit
 };
 
 inline void to_json(json& j, const Ressource& r) {

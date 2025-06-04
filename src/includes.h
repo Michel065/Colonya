@@ -14,10 +14,15 @@
 #include <thread>
 #include <condition_variable>
 #include <mutex>
+#include <shared_mutex>
 #include <atomic>
 #include <chrono>
 #include <string>
 #include <filesystem>
+#include <functional>
+#include <cmath>
+#include <algorithm>
+
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -42,6 +47,11 @@ inline void print(const T& trucs) {
 // def chemin;
 extern std::string textures_file;
 extern std::string worlds_file;
+extern std::string world_file;
+
+// define de va global
+
+#define CHUNK_SIZE 50
 
 
 #endif

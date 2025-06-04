@@ -28,30 +28,46 @@ void test_time_manager(){
 
 }
 
-int main() {
+void test_map_chunk(){
     TimeManager time_manager(2);
-
     start_Time_Manager(time_manager);
 
-    MapManager map_manager("001",time_manager);
-
+    MapManager map_manager("001", time_manager);
     BiomeManager::load_defaults();
 
-    Biome* b1=BiomeManager::get("terre");
-
+    // Création d'une case de test
+    Biome* b1 = BiomeManager::get("terre");
     Ressource re;
-    re.name=1;
+    re.name = 1;
     Structure st;
-    st.name=34;
+    st.name = 34;
     Case c1;
-    c1.set(b1,re,st);
+    c1.set(b1, re, st);
 
+    std::cout << c1 << std::endl;
 
-    std::cout<<c1<<std::endl;
+    // Création d'un Chunk avec cette case partout
+    Chunk chunk(0,0);
+    for (int x = 0; x < 50; ++x)
+        for (int y = 0; y < 50; ++y)
+            chunk.set_case(x, y, c1);  // Méthode à créer si pas encore faite
+
+    // Création manuelle du fichier JSON si inexistant
+    Map& map = map_manager.get_map();
+    
+    map.create_json_chunk(chunk);
+
+    // Chargement et sauvegarde pour test
+    map.load_chunk(0, 0);
+    map.save_chunk(0, 0);
 
     time_manager.stop();
-    
     std::cout << "Simulation terminée." << std::endl;
+}
+
+
+int main() {
+    test_map_chunk();
 
     return 0;
 }

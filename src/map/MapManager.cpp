@@ -15,22 +15,22 @@ MapManager::MapManager(std::string name_map, TimeManager& tm) : name_map(name_ma
 }
 
 void MapManager::save_map_contexte() {
-    print("save contexte ...");
+    print("save map contexte ...");
     MapContexte contexte;
-    contexte.chuncks=carte.getchuncksload();
+    contexte.chuncks=carte.get_all_chunk_keys();
     json contexte_json = contexte; 
     std::ofstream file(world_file+"/"+world_contexte_name);
     file << contexte_json.dump(4);  // 4 = indentation
     file.close();
-    print("contexte save !");
+    print("map contexte save !");
 }
 
 void MapManager::load_map_contexte() {
-    print("load contexte ...");
+    print("load map contexte ...");
     std::string path=world_file+"/"+world_contexte_name;
 
     if (!fs::exists(path) || fs::is_empty(path)) {
-        print("Aucun contexte détecté. Initialisation d’un fichier vide.");
+        print("Aucun map contexte détecté. Initialisation d’un fichier vide.");
         MapContexte contexte;
         contexte.chuncks = {};
         std::ofstream file(path);
@@ -46,11 +46,17 @@ void MapManager::load_map_contexte() {
     MapContexte contexte= contexte_json.get<MapContexte>();
 
     //ensuite faut mettre ka logique
-    print("contexte load !");
+    print("map contexte load !");
 }
+
+Map& MapManager::get_map(){
+    return carte;
+}
+
 
 void MapManager::start() {
     while (time_manager->status()) {
         time_manager->waitNextTick();
     }
 }
+

@@ -12,7 +12,6 @@ class MapManager {
 private:
     std::string name_map="";
     std::string world_contexte_name="contexte.json";
-    std::string world_file;
     Map carte;
     MapGenerator generateur;
     TimeManager* time_manager;
@@ -20,6 +19,7 @@ private:
 public:
     MapManager(std::string name_map,TimeManager& time_manager);
 
+    Map& get_map();
     void save_map_contexte();
     void load_map_contexte();
     

@@ -4,7 +4,7 @@
 #include "../includes.h"
 
 struct MapContexte {
-    std::vector<std::string> chuncks;
+    std::vector<std::pair<int, int>> chuncks;
 };
 
 inline void to_json(json& j, const MapContexte& m) {

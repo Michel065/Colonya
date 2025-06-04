@@ -7,7 +7,7 @@ struct Case;
 struct Structure {
     int name;
     
-    void update(Case& c) const;
+    void update(Case& c){}
 };
 
 inline void to_json(json& j, const Structure& s) {
