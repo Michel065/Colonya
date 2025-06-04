@@ -18,7 +18,6 @@ private:
 
 public:
     MapManager(std::string name_map,TimeManager& time_manager);
-
     Map& get_map();
     void save_map_contexte();
     void load_map_contexte();

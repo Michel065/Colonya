@@ -13,10 +13,17 @@ struct Ressource {
     int name;
     //std::string nom_ressource;
     //int quantite;
+    Ressource(){};
 
     void update(Case& c){}
     //void consome(Creature c) ; comme ca ca modif direct les sta de la creature si c un buff ou de l'eau du mangé ... 
     //quand cide s'autodetruit
+
+    Ressource* clone() const {
+        Ressource* copy = new Ressource();
+        copy->name = name;
+        return copy;
+    }
 };
 
 inline void to_json(json& j, const Ressource& r) {

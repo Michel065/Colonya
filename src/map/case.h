@@ -16,8 +16,8 @@ struct Case {
 
     Case(){}
     ~Case() {
-        delete ressource;
-        delete structure;
+        if(ressource)delete ressource;
+        if(structure)delete structure;
     }
 
     void set_all(Biome* bio, Ressource* re, Structure* st) {
@@ -37,6 +37,14 @@ struct Case {
         constructible = biome && biome->contructible;
     }
 
+    Case* clone() const {
+        Case* copy = new Case();
+        copy->biome = biome; // partagé, pas copié
+        copy->constructible = constructible;
+        copy->ressource = ressource ? ressource->clone() : nullptr;
+        copy->structure = structure ? structure->clone() : nullptr;
+        return copy;
+    }
 };
 
 // JSON serialization

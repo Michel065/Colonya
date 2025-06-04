@@ -3,25 +3,40 @@
 Chunk::Chunk(int cx,int cy){
     coord_x=cx;
     coord_y=cy;
+    init_grid();
 }
 
-Chunk::Chunk(){}
+Chunk::Chunk(){init_grid();}
 
+Chunk::~Chunk() {
+    for (auto& row : grid) {
+        for (Case* c : row) {
+            delete c;
+        }
+    }
+}
 
-Case& Chunk::at(int x, int y) {
+void Chunk::init_grid(){
+    for (int x = 0; x < CHUNK_SIZE; ++x)
+        for (int y = 0; y < CHUNK_SIZE; ++y)
+            grid[x][y] =nullptr;
+}
+
+Case* Chunk::at(int x, int y) {
     return grid[x][y];
 }
 
-void Chunk::set_case(int x, int y, const Case& c) {
+void Chunk::set_case(int x, int y,Case* c) {
     if (is_inside(x,y)){
-        grid[x][y] = std::move(c);
+        if (grid[x][y]) delete grid[x][y];
+        grid[x][y] = c;
     }
 }
 
 void Chunk::update_all() {
     for (int x = 0; x < CHUNK_SIZE; ++x)
         for (int y = 0; y < CHUNK_SIZE; ++y)
-            grid[x][y].update();
+            grid[x][y]->update();
 }
 
 bool Chunk::is_inside(int x, int y){

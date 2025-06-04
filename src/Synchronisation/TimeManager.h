@@ -25,7 +25,7 @@ public:
         */
         tickDuration = std::chrono::milliseconds(1000 / ticksPerSecond);
     }
-
+    
     void start() {
         lastTickTime = std::chrono::steady_clock::now();
         while (running && date < duree_simulation) {

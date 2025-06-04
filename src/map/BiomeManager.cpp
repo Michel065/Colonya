@@ -54,4 +54,6 @@ std::vector<Biome*> BiomeManager::get_all_natural_biome(){
     return bio;
 }
 
-
+void BiomeManager::clear() {
+    biome_map.clear();
+}

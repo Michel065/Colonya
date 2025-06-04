@@ -37,39 +37,46 @@ void test_map_chunk(){
 
     // Création d'une case de test
     Biome* b1 = BiomeManager::get("terre");
-    Ressource re;
-    re.name = 1;
-    Structure st;
-    st.name = 42;
+    Ressource* re = new Ressource;
+    Structure* st = new Structure;
+    re->name = 1;
+    st->name = 42;
     Case c1;
-    c1.set_all(b1, &re, &st);
+    c1.set_all(b1, re, st);
 
-    print(re);
-
-    print(c1.ressource->name);
-
-    Chunk chunk(0,0);
-    for (int y = 0; y < 50; ++y){           
-        chunk.set_case(0, y, c1);
-        print("c1 chunk:");
-        print(chunk.at(0,y).ressource->name);
-    }
-    /*
     // Création d'un Chunk avec cette case partout
     Chunk chunk(0,0);
     for (int x = 0; x < 50; ++x)
         for (int y = 0; y < 50; ++y)
-            chunk.set_case(x, y, c1);  // Méthode à créer si pas encore faite
+            chunk.set_case(x, y, c1.clone());  // Méthode à créer si pas encore faite
 
     // Création manuelle du fichier JSON si inexistant
     Map& map = map_manager.get_map();
     
     map.create_json_chunk(chunk);
 
-    // Chargement et sauvegarde pour test
-    map.load_chunk(0, 0);
-    map.save_chunk(0, 0);
-    */
+    map.load_chunk(0,0);
+
+    Chunk& chunk2 = map.get_chunk(0, 0);
+
+    // Affichage de quelques infos pour vérifier que le Chunk est bien chargé
+    std::cout << "Vérification du chunk (0, 0) : " << std::endl;
+
+    for (int x = 0; x < CHUNK_SIZE; ++x) {
+        for (int y = 0; y < CHUNK_SIZE; ++y) {
+            Case* c = chunk2.at(x, y);
+            if (c) {
+                std::cout << "Case[" << x << "][" << y << "] : ";
+                std::cout << "biome = " << (c->biome ? c->biome->name : "null") << ", ";
+                std::cout << "ressource = " << (c->ressource ? std::to_string(c->ressource->name) : "null") << ", ";
+                std::cout << "structure = " << (c->structure ? std::to_string(c->structure->name) : "null") << std::endl;
+                break;  // une seule case suffit à tester, on sort
+            }
+        }
+    }
+
+    map.save_chunk(0,0);
+
     time_manager.stop();
     std::cout << "Simulation terminée." << std::endl;
 }

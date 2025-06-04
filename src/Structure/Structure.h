@@ -7,7 +7,14 @@ struct Case;
 struct Structure {
     int name;
     
+    Structure(){};
     void update(Case& c){}
+
+    Structure* clone() const {
+        Structure* copy = new Structure();
+        copy->name = name;
+        return copy;
+    }
 };
 
 inline void to_json(json& j, const Structure& s) {

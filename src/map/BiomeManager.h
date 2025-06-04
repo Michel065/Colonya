@@ -18,6 +18,7 @@ public:
     static std::vector<std::string> get_liste_biome();
     static std::vector<Biome*> get_all_biome();
     static std::vector<Biome*> get_all_natural_biome();
+    static void clear();
 };
 
 

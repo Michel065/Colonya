@@ -27,13 +27,7 @@ Chunk& Map::get_chunk(int chunk_x, int chunk_y) {                // a verif apre
 Case& Map::get_case(int world_x, int world_y) {
     auto [chunk_x, chunk_y] = get_chunk_coords(world_x, world_y);
     auto [local_x, local_y] = get_local_coords(world_x, world_y);
-    return get_chunk(chunk_x, chunk_y).at(local_x, local_y);
-}
-
-void Map::set_case(int world_x, int world_y, const Case& c) {
-    auto [chunk_x, chunk_y] = get_chunk_coords(world_x, world_y);
-    auto [local_x, local_y] = get_local_coords(world_x, world_y);
-    get_chunk(chunk_x, chunk_y).at(local_x, local_y) = c;
+    return *(get_chunk(chunk_x, chunk_y).at(local_x, local_y));
 }
 
 void Map::erase_chunk(int cx, int cy) {
@@ -44,7 +38,6 @@ void Map::erase_chunk(int cx, int cy) {
 void Map::save_chunk(int world_x, int world_y) {
     auto [chunk_x, chunk_y] = get_chunk_coords(world_x, world_y);
     print("Sauvegarde du chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " ...");
-
     Chunk chunk(chunk_x,chunk_y);
     {
         std::shared_lock lock(mutex);
@@ -56,14 +49,15 @@ void Map::save_chunk(int world_x, int world_y) {
         create_json_chunk(chunk);  // crée si absent
         return;
     }
-
+    print("la");
     json chunk_json = chunk;
+    print("la");
     std::ofstream file(path);
     if (!file.is_open()) {
         print("Erreur : impossible d’ouvrir " + path);
         return;
     }
-
+    
     file << chunk_json.dump();
     file.close();
     print("Chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " sauvegardé !");

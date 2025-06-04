@@ -22,6 +22,7 @@
 #include <functional>
 #include <cmath>
 #include <algorithm>
+#include <unordered_set>
 
 
 #include <nlohmann/json.hpp>

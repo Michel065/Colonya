@@ -30,8 +30,8 @@ Chunk MapGenerator::generate_chunk(int chunk_x, int chunk_y) const{
             float alt = noisegenerator.altitude(world_x, world_y);
             float hum = noisegenerator.humidity(world_x, world_y);
 
-            Case c;
-            c.set_biome(select_biome(alt, hum));
+            Case* c =new Case;
+            c->set_biome(select_biome(alt, hum));
             chunk.set_case(x, y, c);
         }
     }

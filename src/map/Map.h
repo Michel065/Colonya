@@ -21,7 +21,6 @@ private:
 public:
     Chunk& get_chunk(int chunk_x, int chunk_y);
     Case& get_case(int world_x, int world_y);
-    void set_case(int world_x, int world_y, const Case& c);
     void erase_chunk(int cx, int cy);
     void save_chunk(int world_x, int world_y);
     void save_all_chunks();
