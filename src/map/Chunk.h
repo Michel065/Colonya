@@ -9,7 +9,9 @@ class Chunk {
 private:
 public:
     int coord_x,coord_y;//coord du quoi en haut a gauche
-    Case grid[CHUNK_SIZE][CHUNK_SIZE];
+    Case grid[CHUNK_SIZE][CHUNK_SIZE]; // pour plus tard remetre ca en privée et du coup modif to et from json.
+
+
     Chunk(int cx,int cy);
     Chunk();
     Case& at(int x, int y);

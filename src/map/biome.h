@@ -25,10 +25,12 @@ struct Biome {
         if (evolution_logic) evolution_logic(c);
     }
 
-    bool matches(float altitude, float humidity) const {// pour la generation
-        return altitude >= altitude_min && altitude <= altitude_max &&
-               humidity >= humidity_min && humidity <= humidity_max;
+    float match_score(float altitude, float humidity) const {
+        float a_score = 1.0f - std::abs((altitude_min + altitude_max)/2 - altitude) / ((altitude_max - altitude_min)/2);
+        float h_score = 1.0f - std::abs((humidity_min + humidity_max)/2 - humidity) / ((humidity_max - humidity_min)/2);
+        return std::max(0.0f, (a_score + h_score) / 2.0f);  // Entre 0 et 1
     }
+
 };
 
 //la seriralisation c dans le fichier biomemanager.h

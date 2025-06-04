@@ -33,19 +33,28 @@ void test_map_chunk(){
     start_Time_Manager(time_manager);
 
     MapManager map_manager("001", time_manager);
-    BiomeManager::load_defaults();
+    BiomeManager::load_biomes();
 
     // Création d'une case de test
     Biome* b1 = BiomeManager::get("terre");
     Ressource re;
     re.name = 1;
     Structure st;
-    st.name = 34;
+    st.name = 42;
     Case c1;
-    c1.set(b1, re, st);
+    c1.set_all(b1, &re, &st);
 
-    std::cout << c1 << std::endl;
+    print(re);
 
+    print(c1.ressource->name);
+
+    Chunk chunk(0,0);
+    for (int y = 0; y < 50; ++y){           
+        chunk.set_case(0, y, c1);
+        print("c1 chunk:");
+        print(chunk.at(0,y).ressource->name);
+    }
+    /*
     // Création d'un Chunk avec cette case partout
     Chunk chunk(0,0);
     for (int x = 0; x < 50; ++x)
@@ -60,7 +69,7 @@ void test_map_chunk(){
     // Chargement et sauvegarde pour test
     map.load_chunk(0, 0);
     map.save_chunk(0, 0);
-
+    */
     time_manager.stop();
     std::cout << "Simulation terminée." << std::endl;
 }

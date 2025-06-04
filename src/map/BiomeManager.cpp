@@ -1,6 +1,6 @@
 #include "BiomeManager.h"
 
-void BiomeManager::load_defaults() {
+void BiomeManager::load_biomes() {
     //basique
     biome_map["terre"]     = {"terre",     textures_file + "terre.png",     true,   true};
     biome_map["herbe"]     = {"herbe",     textures_file + "herbe.png",     true,   true};
@@ -21,7 +21,11 @@ void BiomeManager::load_defaults() {
 
 Biome* BiomeManager::get(const std::string& name) {
     auto it = biome_map.find(name);
-    return (it != biome_map.end() ? &it->second : &unknown);
+    return (it != biome_map.end() ? &it->second : &defaut);
+}
+
+Biome* BiomeManager::get_defaut_biome() {
+    return &defaut;
 }
 
 std::vector<std::string> BiomeManager::get_liste_biome() {
@@ -31,4 +35,23 @@ std::vector<std::string> BiomeManager::get_liste_biome() {
     }
     return names;
 }
+
+std::vector<Biome*> BiomeManager::get_all_biome(){
+    std::vector<Biome*> bio;
+    for (auto& [name, biome] : biome_map) {
+        bio.push_back(&biome);
+    }
+    return bio;
+}
+
+std::vector<Biome*> BiomeManager::get_all_natural_biome(){
+    std::vector<Biome*> bio;
+    for (auto& [name, biome] : biome_map) {
+        if(biome.is_natural){
+            bio.push_back(&biome);
+        }
+    }
+    return bio;
+}
+
 

@@ -8,44 +8,71 @@
 #include "../Structure/Structure.h"
 
 struct Case {
-    Biome* biome;
-    Ressource ressource;
-    Structure structure;
+    Biome* biome = nullptr;
+    Ressource* ressource = nullptr;
+    Structure* structure = nullptr;
 
     bool constructible=true;
 
-    void set(Biome* bio, Ressource re,Structure st){biome=bio;ressource=re;structure=st;}
+    Case(){}
+    ~Case() {
+        delete ressource;
+        delete structure;
+    }
+
+    void set_all(Biome* bio, Ressource* re, Structure* st) {
+        biome = bio;
+        ressource = re;
+        structure = st;
+    }
+
+    void set_biome(Biome* bio) {
+        biome = bio;
+    }
+    
     void update() {
         if (biome) biome->update(*this);
-        ressource.update(*this);
-        structure.update(*this);
-        
-        constructible=biome->contructible;// pas utile a revoir
-
+        if (ressource) ressource->update(*this);
+        if (structure) structure->update(*this);
+        constructible = biome && biome->contructible;
     }
+
 };
 
 // JSON serialization
 inline void to_json(json& j, const Case& c) {
-    j = json{
-        {"biome", c.biome},
-        {"ressource", c.ressource},
-        {"structure", c.structure}
-    };
+    j["biome"] = c.biome;
+
+    if (c.ressource)
+        j["ressource"] = *c.ressource;
+    else
+        j["ressource"] = nullptr;
+
+    if (c.structure)
+        j["structure"] = *c.structure;
+    else
+        j["structure"] = nullptr;
 }
 
 inline void from_json(const json& j, Case& c) {
     j.at("biome").get_to(c.biome);
-    j.at("ressource").get_to(c.ressource);
-    j.at("structure").get_to(c.structure);
+
+    if (c.ressource) { delete c.ressource; c.ressource = nullptr; }
+    if (c.structure) { delete c.structure; c.structure = nullptr; }
+
+    if (j.contains("ressource") && !j["ressource"].is_null())
+        c.ressource = new Ressource(j.at("ressource").get<Ressource>());
+
+    if (j.contains("structure") && !j["structure"].is_null())
+        c.structure = new Structure(j.at("structure").get<Structure>());
 }
 
 // Surcharge de l'opérateur <<
 inline std::ostream& operator<<(std::ostream& os, const Case& casde) {
     os << "[Case: " 
        << " | " << *casde.biome 
-       << " | " << casde.ressource
-       << " | " << casde.structure
+       << " | " << *casde.ressource
+       << " | " << *casde.structure
        << "]";
     return os;
 }

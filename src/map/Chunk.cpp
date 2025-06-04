@@ -14,7 +14,7 @@ Case& Chunk::at(int x, int y) {
 
 void Chunk::set_case(int x, int y, const Case& c) {
     if (is_inside(x,y)){
-        grid[x][y] = c;
+        grid[x][y] = std::move(c);
     }
 }
 

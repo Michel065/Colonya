@@ -1,47 +1,41 @@
-# Variables
+# Compilateur et options
 CXX = g++
-CXXFLAGS = -c -Wall -std=c++17 -Ilib
-SFMLFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
+CXXFLAGS = -Wall -std=c++17 -Ilib -Isrc -MMD -MP
+LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
 
-# Cibles
+# Répertoires
+SRC_DIR := src
+BUILD_DIR := build
 
+# Trouve tous les fichiers .cpp dans src/
+SRCS := $(shell find $(SRC_DIR) -name "*.cpp")
+
+# Pour chaque .cpp, crée un chemin .o dans build/
+OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS))
+
+# Pour chaque .o, on aura un fichier .d pour les dépendances
+DEPS := $(OBJS:.o=.d)
+
+# Cible par défaut
 all: main
 
-build/main.o: src/main.cpp src/main.h src/Synchronisation/TimeManager.h src/includes.h src/map/MapManager.h src/map/Case.h src/map/BiomeManager.h 
-	$(CXX) $(CXXFLAGS) -o build/main.o src/main.cpp
+# Génération de l'exécutable final
+main: $(OBJS)
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
-build/mapmanager.o: src/map/MapManager.cpp src/map/MapManager.h src/map/Map.h src/Synchronisation/TimeManager.h src/map/MapContexte.h src/includes.h
-	$(CXX) $(CXXFLAGS) -o build/mapmanager.o src/map/MapManager.cpp
+# Compilation d'un .cpp en .o et génération du .d
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-build/map.o: src/map/Map.cpp src/map/Map.h src/includes.h src/map/Chunk.h
-	$(CXX) $(CXXFLAGS) -o build/map.o src/map/Map.cpp
-
-
-build/chunk.o: src/map/Chunk.cpp src/map/Chunk.h src/map/Case.h src/includes.h
-	$(CXX) $(CXXFLAGS) -o build/chunk.o src/map/Chunk.cpp
-	
-build/BiomeManager.o: src/map/BiomeManager.cpp src/map/BiomeManager.h src/map/Biome.h src/map/Case.h
-	$(CXX) $(CXXFLAGS) -o build/BiomeManager.o src/map/BiomeManager.cpp
-
-build/includes.o: src/includes.cpp src/includes.h 
-	$(CXX) $(CXXFLAGS) -o build/includes.o src/includes.cpp
-
-main: build/main.o build/mapmanager.o  build/includes.o build/chunk.o build/BiomeManager.o  build/map.o 
-	$(CXX) -o main build/main.o build/mapmanager.o build/includes.o build/BiomeManager.o build/map.o build/chunk.o  $(SFMLFLAGS) 	
-
+# Nettoyage
 clean:
-	rm -f build/*.o main
+	rm -rf $(BUILD_DIR) main
 
-c:
-	rm -f build/*.o main
-
-run:
+run: main
 	./main
 
-r:
-	./main
+r: run
 
-tout:
-	make clean
-	make
-	make run
+# Inclure les fichiers de dépendances si existants
+-include $(DEPS)
