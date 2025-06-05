@@ -32,6 +32,9 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 clean:
 	rm -rf $(BUILD_DIR) main
 
+c:
+	rm -rf $(BUILD_DIR) main
+
 run: main
 	./main
 

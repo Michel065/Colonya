@@ -57,33 +57,86 @@ void test_map_chunk(){
 
     map.load_chunk(0,0);
 
-    Chunk& chunk2 = map.get_chunk(0, 0);
-
-    // Affichage de quelques infos pour vérifier que le Chunk est bien chargé
-    std::cout << "Vérification du chunk (0, 0) : " << std::endl;
-
-    for (int x = 0; x < CHUNK_SIZE; ++x) {
-        for (int y = 0; y < CHUNK_SIZE; ++y) {
-            Case* c = chunk2.at(x, y);
-            if (c) {
-                std::cout << "Case[" << x << "][" << y << "] : ";
-                std::cout << "biome = " << (c->biome ? c->biome->name : "null") << ", ";
-                std::cout << "ressource = " << (c->ressource ? std::to_string(c->ressource->name) : "null") << ", ";
-                std::cout << "structure = " << (c->structure ? std::to_string(c->structure->name) : "null") << std::endl;
-                break;  // une seule case suffit à tester, on sort
-            }
-        }
-    }
-
     map.save_chunk(0,0);
 
     time_manager.stop();
     std::cout << "Simulation terminée." << std::endl;
 }
 
+void test_map_generator(){
+    TimeManager time_manager(2);
+    start_Time_Manager(time_manager);
+    MapManager map_manager("001", time_manager);
+    Map& map = map_manager.get_map();
+
+    BiomeManager::load_biomes();
+
+    MapGenerator mapgenerator(42);
+
+    for (int x = 0; x < CHUNK_SIZE; ++x) {
+        for (int y = 0; y < CHUNK_SIZE; ++y) {
+            map.create_json_chunk(*mapgenerator.generate_chunk(x,y));
+        }
+    }  
+    
+
+    time_manager.stop();
+    std::cout << "Simulation terminée." << std::endl;
+}
+
+void test_noise_visualisation() {
+    const int nb_cases = 50;
+    const int case_size = 10;
+    const int size_px = nb_cases * case_size;
+
+    sf::RenderWindow window(sf::VideoMode(size_px, size_px), "Carte Biomes Alt/Hum");
+
+    BiomeManager::load_biomes();
+    NoiseGenerator generator(42, 4, 0.5f);
+
+    sf::Image image;
+    image.create(size_px, size_px);
+
+    std::map<std::string, sf::Color> biome_colors = {
+        {"eau", sf::Color(0, 0, 255)},             // bleu
+        {"sable", sf::Color(240, 240, 100)},       // jaune clair
+        {"plaine", sf::Color(180, 255, 100)},      // vert clair
+        {"herbe", sf::Color(0, 150, 0)},           // vert
+        {"roche", sf::Color(80, 80, 80)},          // gris
+        {"montagne", sf::Color(0, 0, 0)},          // noir
+        {"defaut", sf::Color(255, 0, 255)}         // rose fluo (erreur)
+    };
+
+    for (int x = 0; x < nb_cases; ++x) {
+        for (int y = 0; y < nb_cases; ++y) {
+            float alt = generator.altitude(x, y, 0.05f);
+            float hum = generator.humidity(x, y, 0.05f);
+            alt = (alt + 1.0f) / 2.0f;
+            hum = (hum + 1.0f) / 2.0f;
+
+            Biome* b = BiomeManager::get_best_biome(alt, hum);
+            sf::Color color = biome_colors.count(b->name) ? biome_colors[b->name] : biome_colors["defaut"];
+
+            for (int dx = 0; dx < case_size; ++dx)
+                for (int dy = 0; dy < case_size; ++dy)
+                    image.setPixel(x * case_size + dx, y * case_size + dy, color);
+        }
+    }
+
+    sf::Texture texture;
+    texture.loadFromImage(image);
+    sf::Sprite sprite(texture);
+
+    window.clear();
+    window.draw(sprite);
+    window.display();
+
+    sf::sleep(sf::seconds(10));
+}
+
+
 
 int main() {
-    test_map_chunk();
-
+    test_map_generator();
     return 0;
 }

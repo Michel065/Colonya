@@ -12,12 +12,22 @@ private:
     static inline Biome defaut = {"defaut", "default.png", true};
 
 public:
+    static void add_biome(const std::string& name,
+                      const std::string& texture,
+                      bool walkable,
+                      bool constructible,
+                      float alt_target,
+                      float hum_target,
+                      bool is_natural = true,
+                      std::function<void(Case&)> evolution_logic = nullptr,
+                      float score_boost = 1.0f);
     static void load_biomes();
     static Biome* get(const std::string& name);
     static Biome* get_defaut_biome();
     static std::vector<std::string> get_liste_biome();
     static std::vector<Biome*> get_all_biome();
     static std::vector<Biome*> get_all_natural_biome();
+    static Biome* get_best_biome(float altitude, float humidity);
     static void clear();
 };
 

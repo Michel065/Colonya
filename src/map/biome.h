@@ -12,10 +12,9 @@ struct Biome {
     bool walkable=false;
     bool contructible=false;
     
-    float altitude_min = 0.0f;
-    float altitude_max = 1.0f;
-    float humidity_min = 0.0f;
-    float humidity_max = 1.0f;
+    float alt_target = 0.5f;
+    float hum_target = 0.5f;
+    float score_boost = 1.0f;
 
     bool is_natural = true;
 
@@ -26,10 +25,13 @@ struct Biome {
     }
 
     float match_score(float altitude, float humidity) const {
-        float a_score = 1.0f - std::abs((altitude_min + altitude_max)/2 - altitude) / ((altitude_max - altitude_min)/2);
-        float h_score = 1.0f - std::abs((humidity_min + humidity_max)/2 - humidity) / ((humidity_max - humidity_min)/2);
-        return std::max(0.0f, (a_score + h_score) / 2.0f);  // Entre 0 et 1
+        float a_score = 1.0f - std::abs(alt_target - altitude);
+        float h_score = 1.0f - std::abs(hum_target - humidity);
+
+        float score = std::max(0.0f, (a_score + h_score) / 2.0f);
+        return std::clamp(score * score_boost, 0.0f, 1.0f);
     }
+
 
 };
 
