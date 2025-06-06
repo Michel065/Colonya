@@ -7,7 +7,9 @@
 
 class Chunk {
 private:
+    std::atomic<int> nb_observateurs = 0;
 public:
+    std::atomic<int> nb_observateurs = 0;
     int coord_x,coord_y;//coord du quoi en haut a gauche
     Case* grid[CHUNK_SIZE][CHUNK_SIZE]; // pour plus tard remetre ca en privée et du coup modif to et from json.
 
@@ -22,6 +24,10 @@ public:
     void update_all();
     std::pair<int, int> get_name();
     void set_name(int cx,int cy);
+
+    void add_user();
+    void supp_user();
+    bool il_y_a_des_user()const;
 };
 
 inline void to_json(json& j, const Chunk& c) {

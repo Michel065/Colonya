@@ -32,9 +32,24 @@ Case* Map::get_case(int world_x, int world_y) {
     return (get_chunk(chunk_x, chunk_y)->at(local_x, local_y));
 }
 
-void Map::erase_chunk(int cx, int cy) {
-    std::unique_lock lock(mutex);
-    loaded_chunks.erase({cx, cy});
+void Map::deload_chunk(int chunk_x, int chunk_y) {
+    if (std::make_pair(chunk_x, chunk_y) == chunk_spawn) {
+        print("Chunk de spawn protégé, non déchargé.");
+        return;
+    }
+    std::lock_guard<std::mutex> lock(mutex);
+    auto it = loaded_chunks.find({chunk_x, chunk_y});
+    if (it != loaded_chunks.end()) {
+        Chunk* chunk = it->second;
+
+        if (!chunk->il_y_a_des_user()) {
+            delete chunk;
+            loaded_chunks.erase(it);
+            print("Chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " déchargé.");
+        } else {
+            print("Chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " encore utilisé. Suppression annulée.");
+        }
+    }
 }
 
 void Map::save_chunk(int world_x, int world_y) {
@@ -61,7 +76,7 @@ void Map::save_chunk(int world_x, int world_y) {
     file << chunk_json.dump();
     file.close();
     print("Chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " sauvegardé !");
-    erase_chunk(chunk_x, chunk_y);
+    deload_chunk(chunk_x, chunk_y);
 }
 
 void Map::save_all_chunks() {
@@ -70,9 +85,22 @@ void Map::save_all_chunks() {
     }
 }
 
+bool Map::chunk_deja_load(int chunk_x, int chunk_y){
+    {
+        std::unique_lock lock(mutex);
+        if (loaded_chunks.contains({chunk_x, chunk_y})) {
+            print("chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " déjà chargé");
+            return true;
+        }
+    }
+    return false;
+}
+
 void Map::load_chunk(int world_x, int world_y) {
     auto [chunk_x, chunk_y] = get_chunk_coords(world_x, world_y);
     print("load chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " ...");
+
+    if(chunk_deja_load(chunk_x, chunk_y))return;
 
     std::string path = world_file + "/" + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + ".json";
 
@@ -95,9 +123,6 @@ void Map::load_chunk(int world_x, int world_y) {
         std::unique_lock lock(mutex); // 🔒
         loaded_chunks[{chunk_x, chunk_y}] = chunk;
     }
-
-    print("coucou");
-    print(*loaded_chunks[{0, 0}]->at(5,5)->ressource);
     print("chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + ", Done");
 }
 
@@ -127,4 +152,24 @@ std::vector<std::pair<int, int>> Map::get_all_chunk_keys() {
         keys.push_back(coord);
     }
     return keys;
+}
+
+void Map::load_chunk_from_liste(std::vector<std::pair<int, int>> chunks){
+    for (const auto& [coord_x, coord_y] : chunks) {
+        load_chunk(coord_x, coord_y);
+    }
+}
+
+void Map::deload_chunk_from_liste(std::vector<std::pair<int, int>> chunks){
+    for (const auto& [coord_x, coord_y] : chunks) {
+        deload_chunk(coord_x, coord_y);
+    }
+}
+
+void Map::set_chunk_spawn(std::pair<int, int> chunk_spaw){
+    chunk_spawn=chunk_spaw;
+}
+
+std::pair<int, int> Map::get_chunk_spawn(){
+    return chunk_spawn;
 }

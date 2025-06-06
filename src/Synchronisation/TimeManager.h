@@ -7,14 +7,14 @@ class TimeManager {
     
 private:
     // 1 tick c 0.5 seconde reel donc le temps reel correspond a 2 tick par seconde
-    std::atomic<bool> running;
+    bool running;
     int ticksPerSecond;
     unsigned long date=0;
     unsigned long duree_simulation=100;
     std::chrono::milliseconds tickDuration;
     std::chrono::steady_clock::time_point lastTickTime;
     std::mutex mtx;
-    std::condition_variable tickCV;
+    std::condition_variable tickCV,eventCV ;
 
 
 public:
@@ -80,6 +80,20 @@ public:
         tickCV.wait(lock, [&]() {
             return date >= target_tick || !running;
         });
+    }
+
+    void wait_condition_and_tick(int tick_interval, std::function<bool()> condition) {
+        std::unique_lock<std::mutex> lock(mtx);
+        int start_tick = date;
+
+        eventCV.wait(lock, [&] {
+            return (date - start_tick >= tick_interval) || condition();
+        });
+    }
+
+    void signal_event() {
+        std::lock_guard<std::mutex> lock(mtx);
+        eventCV.notify_all(); // événement externe
     }
 };
 

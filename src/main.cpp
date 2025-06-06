@@ -85,8 +85,8 @@ void test_map_generator(){
 }
 
 void test_noise_visualisation() {
-    const int nb_cases = 50;
-    const int case_size = 10;
+    const int nb_cases = 300;
+    const int case_size = 3;
     const int size_px = nb_cases * case_size;
 
     sf::RenderWindow window(sf::VideoMode(size_px, size_px), "Carte Biomes Alt/Hum");
@@ -134,9 +134,7 @@ void test_noise_visualisation() {
     sf::sleep(sf::seconds(10));
 }
 
-
-
 int main() {
-    test_map_generator();
+    test_noise_visualisation();
     return 0;
 }

@@ -51,3 +51,15 @@ void Chunk::set_name(int cx,int cy){
     coord_x=cx;
     coord_y=cy;
 }
+
+void Chunk::add_user() {
+    nb_observateurs.fetch_add(1, std::memory_order_relaxed);
+}
+
+void Chunk::supp_user() {
+    nb_observateurs.fetch_sub(1, std::memory_order_relaxed);
+}
+
+bool Chunk::il_y_a_des_user() const {
+    return nb_observateurs.load(std::memory_order_relaxed) > 0;
+}

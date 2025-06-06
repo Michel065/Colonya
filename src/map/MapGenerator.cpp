@@ -1,7 +1,11 @@
 #include "MapGenerator.h"
 
-MapGenerator::MapGenerator(unsigned int s ,int o ,float p):noisegenerator(s,o,p){
+MapGenerator::MapGenerator(NoiseParam* par,std::pair<int, int> chunk_spaw):noisegenerator(par),chunk_spawn(chunk_spaw){
     liste_des_biomes=BiomeManager::get_all_natural_biome();
+}
+
+NoiseParam* MapGenerator::get_param(){
+    return noisegenerator.get_param();
 }
 
 Chunk* MapGenerator::generate_chunk(int chunk_x, int chunk_y) const{
