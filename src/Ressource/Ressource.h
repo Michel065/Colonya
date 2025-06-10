@@ -1,7 +1,7 @@
 #ifndef _RESSOURCE_H
 #define _RESSOURCE_H 
 
-#include "../includes.h"
+#include "../Commun/includes.h"
 struct Case;
 
 

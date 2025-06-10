@@ -1,12 +1,13 @@
 #ifndef _MAIN_H
 #define _MAIN_H 
-#include "includes.h"
+#include "./Commun/includes.h"
 
 #include "./Synchronisation/TimeManager.h"
-#include "./map/MapManager.h"
-#include "./map/BiomeManager.h"
-#include "./map/MapGenerator.h"
-#include "./map/Case.h"
+#include "./Map/MapManager.h"
+#include "./Tests/Test.h"
+
+void start_simu();
+
 
 
 

@@ -1,7 +1,8 @@
 #ifndef _PERLIN_NOISE_H
 #define _PERLIN_NOISE_H 
 
-#include "../includes.h"
+#include "../../Commun/includes.h"
+
 
 class PerlinNoise {
 private:

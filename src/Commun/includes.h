@@ -24,12 +24,14 @@
 #include <algorithm>
 #include <unordered_set>
 
-
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-
 #include <unordered_map>
+
+
+//include perso
+#include "./Print.h"
 
 //using et namespace:
 namespace fs = std::filesystem;
@@ -37,22 +39,15 @@ namespace fs = std::filesystem;
 //using namespace std;
 
 
-//fonction de base
+// define de va global
 
-template<typename T>
-inline void print(const T& trucs) {
-    std::cout << trucs << std::endl;
-}
+#define CHUNK_SIZE 50
 
 
 // def chemin;
 extern std::string textures_file;
 extern std::string worlds_file;
 extern std::string world_file;
-
-// define de va global
-
-#define CHUNK_SIZE 50
 
 
 #endif

@@ -34,10 +34,10 @@ Case* Map::get_case(int world_x, int world_y) {
 
 void Map::deload_chunk(int chunk_x, int chunk_y) {
     if (std::make_pair(chunk_x, chunk_y) == chunk_spawn) {
-        print("Chunk de spawn protégé, non déchargé.");
+        print_secondaire_attention("Chunk de spawn protégé, non déchargé.");
         return;
     }
-    std::lock_guard<std::mutex> lock(mutex);
+    std::lock_guard<std::shared_mutex> lock(mutex);
     auto it = loaded_chunks.find({chunk_x, chunk_y});
     if (it != loaded_chunks.end()) {
         Chunk* chunk = it->second;
@@ -45,16 +45,15 @@ void Map::deload_chunk(int chunk_x, int chunk_y) {
         if (!chunk->il_y_a_des_user()) {
             delete chunk;
             loaded_chunks.erase(it);
-            print("Chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " déchargé.");
+            print_secondaire("Chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " déchargé.");
         } else {
-            print("Chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " encore utilisé. Suppression annulée.");
+            print_secondaire_attention("Chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " encore utilisé. Suppression annulée.");
         }
     }
 }
 
-void Map::save_chunk(int world_x, int world_y) {
-    auto [chunk_x, chunk_y] = get_chunk_coords(world_x, world_y);
-    print("Sauvegarde du chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " ...");
+void Map::save_chunk(int chunk_x, int chunk_y) {
+    print_secondaire("Sauvegarde du chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " ...");
     Chunk* chunk;
     {
         std::shared_lock lock(mutex);
@@ -69,13 +68,13 @@ void Map::save_chunk(int world_x, int world_y) {
     json chunk_json = *chunk;
     std::ofstream file(path);
     if (!file.is_open()) {
-        print("Erreur : impossible d’ouvrir " + path);
+        print_error("Erreur : impossible d’ouvrir " + path);
         return;
     }
     
     file << chunk_json.dump();
     file.close();
-    print("Chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " sauvegardé !");
+    print_secondaire("Chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " sauvegardé !");
     deload_chunk(chunk_x, chunk_y);
 }
 
@@ -88,29 +87,28 @@ void Map::save_all_chunks() {
 bool Map::chunk_deja_load(int chunk_x, int chunk_y){
     {
         std::unique_lock lock(mutex);
-        if (loaded_chunks.contains({chunk_x, chunk_y})) {
-            print("chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " déjà chargé");
+        if (loaded_chunks.find({chunk_x, chunk_y}) != loaded_chunks.end()) {
+            print_secondaire_attention("chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " déjà chargé");
             return true;
         }
     }
     return false;
 }
 
-void Map::load_chunk(int world_x, int world_y) {
-    auto [chunk_x, chunk_y] = get_chunk_coords(world_x, world_y);
-    print("load chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " ...");
+void Map::load_chunk(int chunk_x, int chunk_y) {
+    print_secondaire("load chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " ...");
 
     if(chunk_deja_load(chunk_x, chunk_y))return;
 
     std::string path = world_file + "/" + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + ".json";
 
     if (!fs::exists(path) || fs::is_empty(path)) {
-        print("Erreur lors du chargement du chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " !!!");
+        print_error("Erreur lors du chargement du chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " !!!");
         return;
     }
     std::ifstream file(path);
     if (!file) {
-        print("Impossible d’ouvrir le fichier : " + path);
+        print_error("Impossible d’ouvrir le fichier : " + path);
         return;
     }
 
@@ -123,7 +121,7 @@ void Map::load_chunk(int world_x, int world_y) {
         std::unique_lock lock(mutex); // 🔒
         loaded_chunks[{chunk_x, chunk_y}] = chunk;
     }
-    print("chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + ", Done");
+    print_secondaire("chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + ", Done");
 }
 
 
@@ -132,12 +130,12 @@ void Map::create_json_chunk(Chunk& chunk){ // * maintennat
     std::string path = world_file + "/" + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + ".json";
     if (fs::exists(path)) return;  // Ne fait rien si déjà existant
 
-    print("Création du chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y));
+    print_secondaire("Création du chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y));
     json chunk_json = chunk;
 
     std::ofstream file(path);
     if (!file.is_open()) {
-        print("Erreur : impossible de créer " + path);
+        print_error("Erreur : impossible de créer " + path);
         return;
     }
 
@@ -172,4 +170,14 @@ void Map::set_chunk_spawn(std::pair<int, int> chunk_spaw){
 
 std::pair<int, int> Map::get_chunk_spawn(){
     return chunk_spawn;
+}
+
+
+void Map::print_chunks_load(){
+    std::string texte="[";
+    for (const auto& [coord, _] : loaded_chunks) {
+        texte+="{"+std::to_string(coord.first)+"x"+std::to_string(coord.second)+"} ";
+    }
+    texte+="];";
+    print_primaire(texte);
 }

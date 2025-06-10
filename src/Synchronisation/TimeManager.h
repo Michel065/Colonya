@@ -1,7 +1,7 @@
 #ifndef _TIME_MANAGER_H
 #define _TIME_MANAGER_H 
 
-#include "../includes.h"
+#include "../Commun/includes.h"
 
 class TimeManager {
     
@@ -27,6 +27,7 @@ public:
     }
     
     void start() {
+        print_primaire("Demarage Time Manager!");
         lastTickTime = std::chrono::steady_clock::now();
         while (running && date < duree_simulation) {
             auto now = std::chrono::steady_clock::now();
@@ -38,13 +39,13 @@ public:
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));  // Dormir si pas encore de tick
             }
         }
-        //if(date > duree_simulation){stop();}  // Arrêter la simulation une fois la durée atteinte
+        print_primaire("STOP Time Manager!");
     }
 
     void stop() {
-        std::cout << "STOP Time Manager!" << std::endl;
         running = false;
         tickCV.notify_all();
+        eventCV.notify_all();
     }
 
     void tick() {
@@ -82,12 +83,12 @@ public:
         });
     }
 
-    void wait_condition_and_tick(int tick_interval, std::function<bool()> condition) {
+    void wait_condition_and_tick(unsigned long tick_interval, std::function<bool()> condition) {
         std::unique_lock<std::mutex> lock(mtx);
-        int start_tick = date;
+        unsigned long start_tick = date;
 
         eventCV.wait(lock, [&] {
-            return (date - start_tick >= tick_interval) || condition();
+            return !running || (date - start_tick >= tick_interval) || condition();
         });
     }
 
