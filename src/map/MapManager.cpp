@@ -19,7 +19,7 @@ MapManager::~MapManager(){
     if(generateur)delete generateur;
 }
 
-void MapManager::init_map_contexte_file(NoiseParam* param_generator=nullptr) {
+void MapManager::init_map_contexte_file(NoiseParam* param_generator) {
     print("init map contexte ...");
 
     MapContexte contexte;
@@ -37,7 +37,7 @@ void MapManager::init_map_contexte_file(NoiseParam* param_generator=nullptr) {
 void MapManager::save_map_contexte() {
     print("save map contexte ...");
     MapContexte contexte;
-    contexte.chuncks=carte.get_all_chunk_keys();
+    contexte.chunks=carte.get_all_chunk_keys();
     contexte.chunk_spawn=carte.get_chunk_spawn();
     if(generateur)contexte.param=generateur->get_param();
     else contexte.param=new NoiseParam();
@@ -64,11 +64,10 @@ void MapManager::load_map_contexte() {
     MapContexte contexte= contexte_json.get<MapContexte>();
 
     //cas ou tout va bien
+    generateur=new MapGenerator(contexte.param,chunk_spawn);
     carte.set_chunk_spawn(contexte.chunk_spawn);
     load_chunk(contexte.chunk_spawn.first, contexte.chunk_spawn.second);
-    load_all_chunk_from_liste(contexte.chuncks);
-    generateur=new MapGenerator(contexte.param,chunk_spawn);
-
+    load_all_chunk_from_liste(contexte.chunks);
     print("map contexte load !");
 }
 
@@ -87,20 +86,22 @@ void MapManager::demander_load_chunk(int x, int y) {
 void MapManager::demander_deload_chunk(int x, int y) {
     {
         std::lock_guard<std::mutex> lock(mtx_chunks);
-        chuncks_a_load_share.emplace_back(x, y);
+        chunks_a_load_share.emplace_back(x, y);
     }
     time_manager->signal_event(); // réveille le thread si besoin
 }
 
 bool MapManager::chunk_existe(int x, int y){
-    return fs::exists(world_file+"/"+x+"x"+y+".json");
+    return fs::exists(world_file+"/"+std::to_string(x)+"x"+std::to_string(y)+".json");
 }
 
 void MapManager::create_chunk(int x, int y){
     if(!chunk_existe(x,y)){
-        carte.create_json_chunk(*(generateur->generate_chunk(x,y)));
+        Chunk * ch =generateur->generate_chunk(x,y);
+        carte.create_json_chunk(*ch);
+        
     }
-    else print("chunck existe deja creation annule");
+    else print("chunk "+std::to_string(x)+"x"+std::to_string(y)+" existe deja creation annule");
 
 }
 
@@ -114,25 +115,25 @@ void MapManager::load_chunk(int x, int y){
 
 void MapManager::load_all_chunk_from_liste(std::vector<std::pair<int, int>> chunks){
     for (const auto& [coord_x, coord_y] : chunks) {
+        print(coord_x,"x",coord_y);
         load_chunk(coord_x, coord_y);
     }
 }
 
+void MapManager::deload_all_chunk_from_liste(std::vector<std::pair<int, int>> chunks){
+    carte.deload_chunk_from_liste(chunks);
+}
+
 void MapManager::verif_et_creer_autour_chunk(int xx, int yy){
-    for (int x = -1; x < 1; ++x) {
-        for (int y = -1; y < 1; ++y) {
+    for (int x = -1; x <= 1; ++x) {
+        for (int y = -1; y <= 1; ++y) {
             if(!(x == 0 && y == 0))create_chunk(xx+x,yy+y);
         }
     }
 }
 
 void MapManager::start() {
-    while (true) {
-        time_manager->wait_condition_and_tick(cycle_jour_nuit, [&]() {
-            std::lock_guard<std::mutex> lock(mtx_chunks);
-            return !chunks_a_load_share.empty() || !chunks_a_deload_share.empty();
-        });
-
+    while (time_manager->status()) {
         std::vector<std::pair<int, int>> chunks_a_load_local;
         std::vector<std::pair<int, int>> chunks_a_deload_local;
         {
@@ -141,13 +142,24 @@ void MapManager::start() {
             std::swap(chunks_a_deload_local, chunks_a_deload_share);
         }
 
+        if (!chunks_a_load_local.empty()) {
+        std::cout << "Premier chunk : ("
+                  << chunks_a_load_local[0].first << ", "
+                  << chunks_a_load_local[0].second << ")" << std::endl;}
+
         if(!chunks_a_load_local.empty())load_all_chunk_from_liste(chunks_a_load_local);
-        if(!chunks_a_deload_local.empty())load_all_chunk_from_liste(chunks_a_deload_local);
+        if(!chunks_a_deload_local.empty())deload_all_chunk_from_liste(chunks_a_deload_local);
 
         if (time_manager->get_date() % cycle_jour_nuit == 0) {
             // cycle jour/nuit
         }
+        time_manager->wait_condition_and_tick(cycle_jour_nuit, [&]() {
+            std::lock_guard<std::mutex> lock(mtx_chunks);
+            return !chunks_a_load_share.empty() || !chunks_a_deload_share.empty();
+        });
     }
+    save_map_contexte();
+    print("STOP Map Manager!");
 }
 
 void MapManager::set_cycle_jour_nuit(int val){

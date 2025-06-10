@@ -37,7 +37,7 @@ void Map::deload_chunk(int chunk_x, int chunk_y) {
         print("Chunk de spawn protégé, non déchargé.");
         return;
     }
-    std::lock_guard<std::mutex> lock(mutex);
+    std::lock_guard<std::shared_mutex> lock(mutex);
     auto it = loaded_chunks.find({chunk_x, chunk_y});
     if (it != loaded_chunks.end()) {
         Chunk* chunk = it->second;
@@ -88,7 +88,7 @@ void Map::save_all_chunks() {
 bool Map::chunk_deja_load(int chunk_x, int chunk_y){
     {
         std::unique_lock lock(mutex);
-        if (loaded_chunks.contains({chunk_x, chunk_y})) {
+        if (loaded_chunks.find({chunk_x, chunk_y}) != loaded_chunks.end()) {
             print("chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " déjà chargé");
             return true;
         }
@@ -96,8 +96,7 @@ bool Map::chunk_deja_load(int chunk_x, int chunk_y){
     return false;
 }
 
-void Map::load_chunk(int world_x, int world_y) {
-    auto [chunk_x, chunk_y] = get_chunk_coords(world_x, world_y);
+void Map::load_chunk(int chunk_x, int chunk_y) {
     print("load chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " ...");
 
     if(chunk_deja_load(chunk_x, chunk_y))return;
@@ -172,4 +171,14 @@ void Map::set_chunk_spawn(std::pair<int, int> chunk_spaw){
 
 std::pair<int, int> Map::get_chunk_spawn(){
     return chunk_spawn;
+}
+
+
+void Map::print_chunks_load(){
+    std::string texte="[";
+    for (const auto& [coord, _] : loaded_chunks) {
+        texte+="{"+std::to_string(coord.first)+"x"+std::to_string(coord.second)+"} ";
+    }
+    texte+="];";
+    print(texte);
 }

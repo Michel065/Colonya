@@ -37,11 +37,36 @@ namespace fs = std::filesystem;
 //using namespace std;
 
 
+// define de va global
+
+#define CHUNK_SIZE 50
+#define PRINT__ true
+
+
 //fonction de base
 
+template<typename... Args>
+inline void print(const Args&... args) {
+    if constexpr (PRINT__) {
+        (std::cout << ... << args) << std::endl;
+    }
+}
+
+template<typename... Args>
+inline void print_test(const Args&... args) {
+    (std::cout << ... << args) << std::endl;
+}
+
+
 template<typename T>
-inline void print(const T& trucs) {
-    std::cout << trucs << std::endl;
+inline void print_status(const T& trucs, bool status=true) {
+    if constexpr (!PRINT__) return;
+    if(status){
+        std::cout << trucs <<" ..." <<std::endl;
+    }
+    else{
+        std::cout << trucs <<" Done!" <<std::endl;
+    }
 }
 
 
@@ -49,10 +74,6 @@ inline void print(const T& trucs) {
 extern std::string textures_file;
 extern std::string worlds_file;
 extern std::string world_file;
-
-// define de va global
-
-#define CHUNK_SIZE 50
 
 
 #endif

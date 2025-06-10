@@ -5,14 +5,14 @@
 struct NoiseParam;
 
 struct MapContexte {
-    std::vector<std::pair<int, int>> chuncks;
+    std::vector<std::pair<int, int>> chunks;
     std::pair<int, int> chunk_spawn = {0, 0};
     NoiseParam* param; 
 };
 
 inline void to_json(json& j, const MapContexte& m) {
     j = json{
-        {"chuncks", m.chuncks}
+        {"chunks", m.chunks}
     };
         j["chunk_spawn"] = m.chunk_spawn;
 
@@ -22,7 +22,7 @@ inline void to_json(json& j, const MapContexte& m) {
 }
 
 inline void from_json(const json& j, MapContexte& m) {
-    j.at("chuncks").get_to(m.chuncks);
+    j.at("chunks").get_to(m.chunks);
     j.at("chunk_spawn").get_to(m.chunk_spawn);
     
     m.param = new NoiseParam();

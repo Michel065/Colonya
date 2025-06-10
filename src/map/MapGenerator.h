@@ -14,6 +14,7 @@ private:
     std::pair<int, int> chunk_spawn = {0, 0};
 
 public:
+    MapGenerator();
     MapGenerator(NoiseParam* par,std::pair<int, int> chunk_spaw = {0, 0});
     NoiseParam* get_param();
     Chunk* generate_chunk(int chunk_x, int chunk_y) const;

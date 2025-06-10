@@ -26,7 +26,7 @@ public:
     void save_chunk(int world_x, int world_y);
     void save_all_chunks();
     bool chunk_deja_load(int world_x, int world_y);
-    void load_chunk(int world_x, int world_y);
+    void load_chunk(int chunk_x, int chunk_y);
     void create_json_chunk(Chunk& chunk);
     std::vector<std::pair<int, int>>  get_all_chunk_keys();
     void load_chunk_from_liste(std::vector<std::pair<int, int>> chunks);
@@ -34,7 +34,8 @@ public:
     void set_chunk_spawn(std::pair<int, int> chunk_spaw);
     std::pair<int, int> get_chunk_spawn();
 
-    
+
+    void print_chunks_load();
     
 };
 

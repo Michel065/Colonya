@@ -4,6 +4,10 @@ MapGenerator::MapGenerator(NoiseParam* par,std::pair<int, int> chunk_spaw):noise
     liste_des_biomes=BiomeManager::get_all_natural_biome();
 }
 
+MapGenerator::MapGenerator():noisegenerator(new NoiseParam),chunk_spawn({0,0}){
+    liste_des_biomes=BiomeManager::get_all_natural_biome();
+}
+
 NoiseParam* MapGenerator::get_param(){
     return noisegenerator.get_param();
 }
@@ -15,7 +19,6 @@ Chunk* MapGenerator::generate_chunk(int chunk_x, int chunk_y) const{
         for (int y = 0; y < CHUNK_SIZE; ++y) {
             int world_x = chunk_x * CHUNK_SIZE + x;
             int world_y = chunk_y * CHUNK_SIZE + y;
-
             float alt = noisegenerator.altitude(world_x, world_y);
             float hum = noisegenerator.humidity(world_x, world_y);
 

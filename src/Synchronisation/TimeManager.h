@@ -45,6 +45,7 @@ public:
         std::cout << "STOP Time Manager!" << std::endl;
         running = false;
         tickCV.notify_all();
+        eventCV.notify_all();
     }
 
     void tick() {
@@ -82,12 +83,12 @@ public:
         });
     }
 
-    void wait_condition_and_tick(int tick_interval, std::function<bool()> condition) {
+    void wait_condition_and_tick(unsigned long tick_interval, std::function<bool()> condition) {
         std::unique_lock<std::mutex> lock(mtx);
-        int start_tick = date;
+        unsigned long start_tick = date;
 
         eventCV.wait(lock, [&] {
-            return (date - start_tick >= tick_interval) || condition();
+            return !running || (date - start_tick >= tick_interval) || condition();
         });
     }
 
