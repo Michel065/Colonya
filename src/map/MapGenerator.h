@@ -1,7 +1,7 @@
 #ifndef _MAP_GENERATOR_H
 #define _MAP_GENERATOR_H 
 
-#include "../includes.h"
+#include "../Commun/includes.h"
 #include "Biome.h"
 #include "Chunk.h"
 #include "NoiseGenerator.h"

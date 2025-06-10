@@ -1,7 +1,7 @@
 #ifndef _BIOME_H
 #define _BIOME_H 
 
-#include "../includes.h"
+#include "../Commun/includes.h"
 
 class BiomeManager;
 struct Case;

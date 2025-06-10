@@ -1,7 +1,7 @@
 #ifndef _MAP_H
 #define _MAP_H
 
-#include "../includes.h"
+#include "../Commun/includes.h"
 #include "./Chunk.h"
 
 struct pair_hash {// merci chat
@@ -23,9 +23,9 @@ public:
     Chunk * get_chunk(int chunk_x, int chunk_y);
     Case* get_case(int world_x, int world_y);
     void deload_chunk(int cx, int cy);
-    void save_chunk(int world_x, int world_y);
+    void save_chunk(int chunk_x, int chunk_y);
     void save_all_chunks();
-    bool chunk_deja_load(int world_x, int world_y);
+    bool chunk_deja_load(int chunk_x, int chunk_y);
     void load_chunk(int chunk_x, int chunk_y);
     void create_json_chunk(Chunk& chunk);
     std::vector<std::pair<int, int>>  get_all_chunk_keys();

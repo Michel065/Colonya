@@ -142,44 +142,48 @@ void test_noise_visualisation() {
 }
 
 void test_Map_Manager() {
-    print("Debut Simulation.");
-    print("Init(Thread) ...");
-
+    print_primaire("Debut Simulation.");
+    print_status(true,"Init(Thread)");
     TimeManager time_manager(2);
     start_Time_Manager(time_manager);
-
     MapManager map_manager("001", time_manager);
     start_Map_Manager(map_manager);
-
-    print("Init(Thread) Done");
-    print("Wait");
+    print_status(false,"Init(Thread)");
+    print_secondaire("Wait");
     sf::sleep(sf::seconds(2));
 
-    print_status("Get Map manager + print");
+    print_status(true,"Get Map manager + print");
     Map& map = map_manager.get_map();
     map.print_chunks_load();
-    print_status("Get Map manager + print",false);
+    print_status(false,"Get Map manager + print");
 
-    print("Wait");
+    print_secondaire("Wait");
     sf::sleep(sf::seconds(2));
-    print_status("On demande a load");
+    print_status(true,"On demande a load");
     map_manager.demander_load_chunk(50,50);
     map_manager.demander_load_chunk(51,50);
     map.print_chunks_load();
-    print_status("On demande a load",false);
+    print_status(false,"On demande a load");
 
-    print("Wait");
+    print_secondaire("Wait");
     sf::sleep(sf::seconds(2));
-    print_status("On demande a deload");
-    map_manager.demander_deload_chunk(50,50);
+    print_status(true,"On demande a deload");
+    map_manager.demander_deload_chunk(51,50);
     map.print_chunks_load();
-    print_status("On demande a deload",false);
+    print_status(false,"On demande a deload");
+
     
+    print_secondaire("Wait");
+    sf::sleep(sf::seconds(0.1));
     time_manager.stop();
-    print("Simulation terminée.");
+    print_secondaire("Wait");
+    sf::sleep(sf::seconds(0.4));
+    print_primaire("Simulation terminée.");
 }
 
 int main_test(){
+    print_primaire("!!! MODE TEST !!!");
     test_Map_Manager();
+    print_primaire("!!! FIN MODE TEST !!!");
     return 0;
 }

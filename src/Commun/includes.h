@@ -24,12 +24,14 @@
 #include <algorithm>
 #include <unordered_set>
 
-
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-
 #include <unordered_map>
+
+
+//include perso
+#include "./Print.h"
 
 //using et namespace:
 namespace fs = std::filesystem;
@@ -40,34 +42,6 @@ namespace fs = std::filesystem;
 // define de va global
 
 #define CHUNK_SIZE 50
-#define PRINT__ true
-
-
-//fonction de base
-
-template<typename... Args>
-inline void print(const Args&... args) {
-    if constexpr (PRINT__) {
-        (std::cout << ... << args) << std::endl;
-    }
-}
-
-template<typename... Args>
-inline void print_test(const Args&... args) {
-    (std::cout << ... << args) << std::endl;
-}
-
-
-template<typename T>
-inline void print_status(const T& trucs, bool status=true) {
-    if constexpr (!PRINT__) return;
-    if(status){
-        std::cout << trucs <<" ..." <<std::endl;
-    }
-    else{
-        std::cout << trucs <<" Done!" <<std::endl;
-    }
-}
 
 
 // def chemin;

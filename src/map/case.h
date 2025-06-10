@@ -1,7 +1,7 @@
 #ifndef _CASE_H
 #define _CASE_H 
 
-#include "../includes.h"
+#include "../Commun/includes.h"
 
 #include "./BiomeManager.h"
 #include "../Ressource/Ressource.h"

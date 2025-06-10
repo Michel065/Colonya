@@ -1,7 +1,7 @@
 #ifndef MAP_CONTEXTE_H
 #define MAP_CONTEXTE_H
 
-#include "../includes.h"
+#include "../Commun/includes.h"
 struct NoiseParam;
 
 struct MapContexte {

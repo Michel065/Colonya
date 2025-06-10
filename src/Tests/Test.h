@@ -1,6 +1,6 @@
 #ifndef _TEST_H
 #define _TEST_H 
-#include "includes.h"
+#include "../Commun/includes.h"
 
 #include "./Synchronisation/TimeManager.h"
 #include "./map/MapManager.h"

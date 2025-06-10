@@ -1,7 +1,7 @@
 #ifndef _MAP_MANAGER_H
 #define _MAP_MANAGER_H 
 
-#include "../includes.h"
+#include "../Commun/includes.h"
 
 #include "./Map.h"
 #include "./MapGenerator.h"

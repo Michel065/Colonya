@@ -1,7 +1,8 @@
 #ifndef _STRUCTURE_H
 #define _STRUCTURE_H 
 
-#include "../includes.h"
+#include "../Commun/includes.h"
+
 struct Case;
 
 struct Structure {

@@ -3,13 +3,14 @@
 MapManager::MapManager(std::string name_map, TimeManager& tm, NoiseParam* param_generator,std::pair<int, int> chunk_spaw) : name_map(name_map),time_manager(&tm) {  
     world_file=worlds_file+name_map;
     chunk_spawn=chunk_spaw;
-    print(world_file);
     if (fs::exists(world_file)) {
-        print("Le monde existe.");
+        print_primaire("Le monde ",world_file," existe.");
     } else {
-        print("Le monde n'existe pas! \n Creation en cours ...");
-        fs::create_directories(world_file); 
-        print("Dossier creer!");
+        print_error("Le monde ",world_file," n'existe pas!");
+        print_primaire("Creation du monde ...");
+        print_status(true,"Creation du dossier monde");
+        fs::create_directories(world_file);
+        print_status(false,"Creation du dossier monde");
         init_map_contexte_file(param_generator);
     }
     load_map_contexte();
@@ -20,8 +21,7 @@ MapManager::~MapManager(){
 }
 
 void MapManager::init_map_contexte_file(NoiseParam* param_generator) {
-    print("init map contexte ...");
-
+    print_status(true,"Initialisation du contexte de generation de la carte");
     MapContexte contexte;
     contexte.chunk_spawn=chunk_spawn;
     if(!param_generator)contexte.param=new NoiseParam();
@@ -31,11 +31,11 @@ void MapManager::init_map_contexte_file(NoiseParam* param_generator) {
     std::ofstream file(world_file+"/"+world_contexte_name);
     file << contexte_json.dump(4);
     file.close();
-    print("map contexte inititialisé !");
+    print_status(false,"Initialisation du contexte de generation de la carte");
 }
 
 void MapManager::save_map_contexte() {
-    print("save map contexte ...");
+    print_status(true,"sauvegarde map contexte");
     MapContexte contexte;
     contexte.chunks=carte.get_all_chunk_keys();
     contexte.chunk_spawn=carte.get_chunk_spawn();
@@ -46,11 +46,11 @@ void MapManager::save_map_contexte() {
     std::ofstream file(world_file+"/"+world_contexte_name);
     file << contexte_json.dump(4);
     file.close();
-    print("map contexte save !");
+    print_status(false,"sauvegarde map contexte");
 }
 
 void MapManager::load_map_contexte() {
-    print("load map contexte ...");
+    print_status(true,"load map contexte");
     std::string path=world_file+"/"+world_contexte_name;
     if (!fs::exists(path) || fs::is_empty(path)) {
         print("Aucun map contexte détecté. Initialisation de Map manager avec les valeur apr defaut.");
@@ -68,7 +68,7 @@ void MapManager::load_map_contexte() {
     carte.set_chunk_spawn(contexte.chunk_spawn);
     load_chunk(contexte.chunk_spawn.first, contexte.chunk_spawn.second);
     load_all_chunk_from_liste(contexte.chunks);
-    print("map contexte load !");
+    print_status(false,"load map contexte");
 }
 
 Map& MapManager::get_map(){
@@ -86,7 +86,7 @@ void MapManager::demander_load_chunk(int x, int y) {
 void MapManager::demander_deload_chunk(int x, int y) {
     {
         std::lock_guard<std::mutex> lock(mtx_chunks);
-        chunks_a_load_share.emplace_back(x, y);
+        chunks_a_deload_share.emplace_back(x, y);
     }
     time_manager->signal_event(); // réveille le thread si besoin
 }
@@ -101,11 +101,12 @@ void MapManager::create_chunk(int x, int y){
         carte.create_json_chunk(*ch);
         
     }
-    else print("chunk "+std::to_string(x)+"x"+std::to_string(y)+" existe deja creation annule");
+    else print_secondaire_attention("chunk "+std::to_string(x)+"x"+std::to_string(y)+" existe deja creation annule");
 
 }
 
 void MapManager::load_chunk(int x, int y){
+    print_secondaire("load chunk ",x,"x",y);
     if(!chunk_existe(x,y)){
         create_chunk(x,y);
     }
@@ -115,7 +116,6 @@ void MapManager::load_chunk(int x, int y){
 
 void MapManager::load_all_chunk_from_liste(std::vector<std::pair<int, int>> chunks){
     for (const auto& [coord_x, coord_y] : chunks) {
-        print(coord_x,"x",coord_y);
         load_chunk(coord_x, coord_y);
     }
 }
@@ -125,6 +125,7 @@ void MapManager::deload_all_chunk_from_liste(std::vector<std::pair<int, int>> ch
 }
 
 void MapManager::verif_et_creer_autour_chunk(int xx, int yy){
+    print_secondaire("verification autour chunk ",xx,"x",yy);
     for (int x = -1; x <= 1; ++x) {
         for (int y = -1; y <= 1; ++y) {
             if(!(x == 0 && y == 0))create_chunk(xx+x,yy+y);
@@ -133,6 +134,7 @@ void MapManager::verif_et_creer_autour_chunk(int xx, int yy){
 }
 
 void MapManager::start() {
+    print_primaire("Demarage Map Manager!");
     while (time_manager->status()) {
         std::vector<std::pair<int, int>> chunks_a_load_local;
         std::vector<std::pair<int, int>> chunks_a_deload_local;
@@ -141,11 +143,6 @@ void MapManager::start() {
             std::swap(chunks_a_load_local, chunks_a_load_share);
             std::swap(chunks_a_deload_local, chunks_a_deload_share);
         }
-
-        if (!chunks_a_load_local.empty()) {
-        std::cout << "Premier chunk : ("
-                  << chunks_a_load_local[0].first << ", "
-                  << chunks_a_load_local[0].second << ")" << std::endl;}
 
         if(!chunks_a_load_local.empty())load_all_chunk_from_liste(chunks_a_load_local);
         if(!chunks_a_deload_local.empty())deload_all_chunk_from_liste(chunks_a_deload_local);
@@ -159,7 +156,7 @@ void MapManager::start() {
         });
     }
     save_map_contexte();
-    print("STOP Map Manager!");
+    print_primaire("STOP Map Manager!");
 }
 
 void MapManager::set_cycle_jour_nuit(int val){

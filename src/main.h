@@ -1,10 +1,10 @@
 #ifndef _MAIN_H
 #define _MAIN_H 
-#include "includes.h"
+#include "./Commun/includes.h"
 
 #include "./Synchronisation/TimeManager.h"
-#include "./map/MapManager.h"
-#include "test.h"
+#include "./Map/MapManager.h"
+#include "./Tests/Test.h"
 
 void start_simu();
 

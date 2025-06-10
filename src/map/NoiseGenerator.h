@@ -1,8 +1,8 @@
 #ifndef _NOISE_GENERATOR_H
 #define _NOISE_GENERATOR_H 
 
-#include "../includes.h"
-#include "PerlinNoise.h"
+#include "../Commun/includes.h"
+#include "./NoiseMethode/PerlinNoise.h"
 
 struct NoiseParam
 {
