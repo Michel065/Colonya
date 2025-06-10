@@ -181,6 +181,7 @@ void test_Map_Manager() {
     print_primaire("Simulation terminée.");
 }
 
+
 int main_test(){
     print_primaire("!!! MODE TEST !!!");
     test_Map_Manager();
