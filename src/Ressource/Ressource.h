@@ -2,43 +2,41 @@
 #define _RESSOURCE_H 
 
 #include "../Commun/includes.h"
+#include "./RessourceType.h"
+#include "./RessourceInfoManager.h"
+#include "../Entite/Entite.h"
+
 struct Case;
 
+class Ressource {
+protected:
+    RessourceType type;
+    std::atomic<int> utilisations;
+    virtual void update_perso(Case& c) = 0;
 
-/*
-les ressource ne sont pas cumulable (ex:64) par contre elle on une quantité d'utilisation (ex: eau 20 utilisation)
-*/
+public:
+    Ressource(RessourceType t, int uses = 1) : type(t), utilisations(uses) {}
+    Ressource(const Ressource& other);
+    virtual ~Ressource() = default;
 
-struct Ressource {
-    int name;
-    //std::string nom_ressource;
-    //int quantite;
-    Ressource(){};
+    void decremente_utilisation();
+    void set_utilisation(int val);
+    RessourceType get_type()const;
+    int get_nbr_utilisation()const;
+    void update_logique(Case& c);
 
-    void update(Case& c){}
-    //void consome(Creature c) ; comme ca ca modif direct les sta de la creature si c un buff ou de l'eau du mangé ... 
-    //quand cide s'autodetruit
+    //recup en rappor avec les info fixe
+    std::string get_texture();
+    std::string get_name()const;
+    RessourceInfo& get_info();
 
-    Ressource* clone() const {
-        Ressource* copy = new Ressource();
-        copy->name = name;
-        return copy;
-    }
+    virtual void consommer(Entite* ent,Case& c) = 0;
+
+
+    virtual Ressource* clone() const = 0;
+
+    Ressource& operator=(const Ressource& other);
 };
 
-inline void to_json(json& j, const Ressource& r) {
-    j = json{{"name", r.name}};
-}
-
-inline void from_json(const json& j, Ressource& r) {
-    j.at("name").get_to(r.name);
-}
-
-// Surcharge de l'opérateur <<
-inline std::ostream& operator<<(std::ostream& os, const Ressource& res) {
-    os << "[Ressource: " << res.name 
-       << "]";
-    return os;
-}
-
+std::ostream& operator<<(std::ostream& os, const Ressource& r);
 #endif

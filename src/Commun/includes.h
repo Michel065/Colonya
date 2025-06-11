@@ -23,12 +23,10 @@
 #include <cmath>
 #include <algorithm>
 #include <unordered_set>
+#include <unordered_map>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
-
-#include <unordered_map>
-
 
 //include perso
 #include "./Print.h"

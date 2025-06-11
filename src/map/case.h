@@ -4,7 +4,7 @@
 #include "../Commun/includes.h"
 
 #include "./BiomeManager.h"
-#include "../Ressource/Ressource.h"
+#include "../Ressource/RessourceManager.h"
 #include "../Structure/Structure.h"
 
 struct Case {
@@ -14,37 +14,21 @@ struct Case {
 
     bool constructible=true;
 
-    Case(){}
-    ~Case() {
-        if(ressource)delete ressource;
-        if(structure)delete structure;
-    }
+    Case();
+    ~Case();
 
-    void set_all(Biome* bio, Ressource* re, Structure* st) {
-        biome = bio;
-        ressource = re;
-        structure = st;
-    }
+    void set_all(Biome* bio, Ressource* re, Structure* st);
+    void set_biome(Biome* bio);
+    bool set_ressource(Ressource* bio); // a finir
+    bool set_structure(Structure* bio);
 
-    void set_biome(Biome* bio) {
-        biome = bio;
-    }
+    Biome* get_biome();
+    Ressource* get_ressource();
+    Structure* get_structure();
     
-    void update() {
-        if (biome) biome->update(*this);
-        if (ressource) ressource->update(*this);
-        if (structure) structure->update(*this);
-        constructible = biome && biome->contructible;
-    }
+    void update();
 
-    Case* clone() const {
-        Case* copy = new Case();
-        copy->biome = biome; // partagé, pas copié
-        copy->constructible = constructible;
-        copy->ressource = ressource ? ressource->clone() : nullptr;
-        copy->structure = structure ? structure->clone() : nullptr;
-        return copy;
-    }
+    Case* clone() const;
 };
 
 // JSON serialization
@@ -69,7 +53,10 @@ inline void from_json(const json& j, Case& c) {
     if (c.structure) { delete c.structure; c.structure = nullptr; }
 
     if (j.contains("ressource") && !j["ressource"].is_null())
-        c.ressource = new Ressource(j.at("ressource").get<Ressource>());
+        from_json(j.at("ressource"), c.ressource);
+    else
+        delete c.ressource;
+
 
     if (j.contains("structure") && !j["structure"].is_null())
         c.structure = new Structure(j.at("structure").get<Structure>());
@@ -79,7 +66,7 @@ inline void from_json(const json& j, Case& c) {
 inline std::ostream& operator<<(std::ostream& os, const Case& casde) {
     os << "[Case: " 
        << " | " << *casde.biome 
-       << " | " << *casde.ressource
+       << " | " << *(casde.ressource)
        << " | " << *casde.structure
        << "]";
     return os;
