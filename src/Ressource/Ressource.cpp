@@ -20,14 +20,10 @@ int Ressource::get_nbr_utilisation()const{
     return utilisations.load();
 }
 
-void Ressource::update_logique(Case& c){
-    if(get_nbr_utilisation()<=0){
-        delete c.ressource;
-        c.ressource=nullptr;
-    }
-
-    update_perso(c);
+bool Ressource::doit_etre_supprimee() const {
+    return get_nbr_utilisation() <= 0;
 }
+
 
 std::string Ressource::get_texture(){
     return RessourceInfoManager::get_info(type).texture_path;
@@ -40,6 +36,16 @@ std::string Ressource::get_name()const{
 RessourceInfo& Ressource::get_info(){
     return RessourceInfoManager::get_info(type);
 }
+
+void Ressource::set_time_manager(TimeManager* time){
+    time_manager=time;
+}
+
+
+
+
+
+
 
 
 

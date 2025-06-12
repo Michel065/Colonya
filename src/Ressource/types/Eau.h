@@ -11,10 +11,10 @@ public:
         decremente_utilisation();
         std::cout << "La créature boit de l'eau (" << get_nbr_utilisation() << " restantes)\n";
 
-        update_logique(c);
+        update(c);
     }
 
-    void update_perso(Case& c) override {
+    void update(Case& c) override {
         // comportement spécifique, facultatif
     }
 

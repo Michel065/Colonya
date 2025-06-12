@@ -188,15 +188,17 @@ void test_ressource_manager() {
 
     // Création d'une Case avec une ressource Eau
     Case c;
-    c.ressource = eau;
-
+    c.set_ressource(eau);
+    Ressource* tmp;
     Entite ent;
 
     if (eau) {
-        for(int i=0;i<19;i++){
-            eau->consommer(&ent,c);
+        for(int i=0;i<2;i++){
+            c.update();
+            tmp = c.get_ressource();
+            if(tmp)tmp->consommer(&ent,c);
+            else print_error("Pas de ressource dans la case ressource.");
         }
-        eau->consommer(&ent,c);
     } else {
         print_error("ressource inconnue.");
         return;
