@@ -1,4 +1,4 @@
-#include "test.h"
+#include "Test.h"
 
 void start_Time_Manager(TimeManager &tm) {
     std::thread timeThread([&tm]() {
@@ -15,7 +15,7 @@ void start_Map_Manager(MapManager &mm) {
 
     Map_Manaher_Thread.detach();
 }
-
+/*
 void test_time_manager(){
     TimeManager tm(2);
 
@@ -140,6 +140,7 @@ void test_noise_visualisation() {
 
     sf::sleep(sf::seconds(100));
 }
+*/
 
 void test_Map_Manager() {
     print_primaire("Debut Simulation.");
@@ -181,10 +182,37 @@ void test_Map_Manager() {
     print_primaire("Simulation terminée.");
 }
 
+void test_ressource_manager() {
+    // Création et test d'une ressource manuelle
+    Ressource* eau = RessourceManager::creer(RessourceType::EAU);
+
+    // Création d'une Case avec une ressource Eau
+    Case c;
+    c.set_ressource(eau);
+    Ressource* tmp;
+    Entite ent;
+
+    if (eau) {
+        for(int i=0;i<2;i++){
+            c.update();
+            tmp = c.get_ressource();
+            if(tmp)tmp->consommer(&ent,c);
+            else print_error("Pas de ressource dans la case ressource.");
+        }
+    } else {
+        print_error("ressource inconnue.");
+        return;
+    }    
+
+    // Sauvegarde JSON
+    json j = c;
+    std::cout << "JSON de la case avec eau :\n" << j.dump(4) << std::endl;
+}
+
 
 int main_test(){
     print_primaire("!!! MODE TEST !!!");
-    test_Map_Manager();
+    test_ressource_manager();
     print_primaire("!!! FIN MODE TEST !!!");
     return 0;
 }

@@ -1,0 +1,10 @@
+{
+    "biome": {
+        "biome_name": "defaut"
+    },
+    "ressource": {
+        "type": 0,
+        "utilisations": 20
+    },
+    "structure": null
+}
