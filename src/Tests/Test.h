@@ -4,7 +4,7 @@
 
 #include "../Synchronisation/TimeManager.h"
 #include "../Map/MapManager.h"
-#include "../Map/BiomeManager.h"
+#include "../Terrain/TerrainManager.h"
 #include "../Map/MapGenerator.h"
 #include "../Map/Case.h"
 

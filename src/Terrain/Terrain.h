@@ -1,12 +1,12 @@
-#ifndef _BIOME_H
-#define _BIOME_H 
+#ifndef _TERRAIN_H
+#define _TERRAIN_H 
 
 #include "../Commun/includes.h"
 
-class BiomeManager;
+class TerrainManager;
 struct Case;
 
-struct Biome {
+struct Terrain {
     std::string name;
     std::string texture;
     bool walkable=false;
@@ -35,14 +35,14 @@ struct Biome {
 
 };
 
-//la seriralisation c dans le fichier biomemanager.h
+//la seriralisation c dans le fichier terrainmanager.h
 
 // Surcharge de l'opérateur <<
-inline std::ostream& operator<<(std::ostream& os, const Biome& biome) {
-    os << "[Biome: " << biome.name 
-       << " | Texture: " << biome.texture 
-       << " | Walkable: " << (biome.walkable ? "oui" : "non")
-       << " | Contructible: " << (biome.contructible ? "oui" : "non")
+inline std::ostream& operator<<(std::ostream& os, const Terrain& terrain) {
+    os << "[Terrain: " << terrain.name 
+       << " | Texture: " << terrain.texture 
+       << " | Walkable: " << (terrain.walkable ? "oui" : "non")
+       << " | Constructible: " << (terrain.contructible ? "oui" : "non")
        << "]";
     return os;
 }
