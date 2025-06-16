@@ -6,7 +6,8 @@
 class TerrainManager;
 struct Case;
 
-struct Terrain {
+class Terrain {
+public:
     std::string name;
     std::string texture;
     bool walkable=false;
@@ -18,11 +19,14 @@ struct Terrain {
 
     bool is_natural = true;
 
-    std::function<void(Case&)> evolution_logic = nullptr;  // logique optionnelle
+    Terrain(std::string n = "defaut", std::string tex = "default.png",
+            bool walk = true, bool build = true)
+        : name(n), texture(tex), walkable(walk), contructible(build) {}
 
-    void update(Case& c) const {
-        if (evolution_logic) evolution_logic(c);
-    }
+    virtual ~Terrain() = default;
+
+    virtual void update(Case& c) const {}  // méthode virtuelle, on override dans les types
+    virtual Terrain* clone() const = 0;
 
     float match_score(float altitude, float humidity) const {
         float a_score = 1.0f - std::abs(alt_target - altitude);

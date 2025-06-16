@@ -9,6 +9,7 @@
 #include "../Map/Case.h"
 
 #include "../Ressource/all_ressource.h"
+#include "../Terrain/all_terrain.h"
 
 int main_test();
 

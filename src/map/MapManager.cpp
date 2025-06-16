@@ -99,7 +99,6 @@ void MapManager::create_chunk(int x, int y){
     if(!chunk_existe(x,y)){
         Chunk * ch =generateur->generate_chunk(x,y);
         carte.create_json_chunk(*ch);
-        
     }
     else print_secondaire_attention("chunk "+std::to_string(x)+"x"+std::to_string(y)+" existe deja creation annule");
 

@@ -32,7 +32,12 @@ Case* Map::get_case(int world_x, int world_y) {
     return (get_chunk(chunk_x, chunk_y)->at(local_x, local_y));
 }
 
+void Map::delete_chunk(Chunk* chu) {
+    if(chu)delete chu;
+}
+
 void Map::deload_chunk(int chunk_x, int chunk_y) {
+    
     if (std::make_pair(chunk_x, chunk_y) == chunk_spawn) {
         print_secondaire_attention("Chunk de spawn protégé, non déchargé.");
         return;
@@ -41,11 +46,11 @@ void Map::deload_chunk(int chunk_x, int chunk_y) {
     auto it = loaded_chunks.find({chunk_x, chunk_y});
     if (it != loaded_chunks.end()) {
         Chunk* chunk = it->second;
-
+        
         if (!chunk->il_y_a_des_user()) {
-            delete chunk;
             loaded_chunks.erase(it);
-            print_secondaire("Chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " déchargé.");
+            delete_chunk(chunk);
+            print_secondaire("Chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " supprimé.");
         } else {
             print_secondaire_attention("Chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " encore utilisé. Suppression annulée.");
         }

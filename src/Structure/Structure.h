@@ -2,37 +2,42 @@
 #define _STRUCTURE_H 
 
 #include "../Commun/includes.h"
+#include "../Synchronisation/TimeManager.h"
+
+#include "./StructureType.h"
+#include "./StructureInfoManager.h"
+#include "../Entite/Entite.h"
 
 struct Case;
 
-struct Structure {
-    int name;
-    
-    Structure(){};
-    void update(Case& c){}
+class Structure {
+protected:
+    StructureType type;
+    std::atomic<int> utilisations;
+    TimeManager* time_manager=nullptr;
 
-    Structure* clone() const {
-        Structure* copy = new Structure();
-        copy->name = name;
-        return copy;
-    }
+public:
+    Structure(StructureType t, int uses = 1) : type(t), utilisations(uses) {}
+    Structure(const Structure& other);
+    virtual ~Structure() = default;
+
+    StructureType get_type()const;
+    void set_time_manager(TimeManager* time);
+
+    //recup en rappor avec les info fixe
+    std::string get_texture();
+    std::string get_name()const;
+    StructureInfo& get_info();
+    
+    virtual void update(Case& c) = 0;
+
+
+
+
+    virtual Structure* clone() const = 0;
+
+    Structure& operator=(const Structure& other);
 };
 
-inline void to_json(json& j, const Structure& s) {
-    j = json{{"type", s.name}};
-}
-
-inline void from_json(const json& j, Structure& s) {
-    j.at("type").get_to(s.name);
-}
-
-// Surcharge de l'opérateur <<
-inline std::ostream& operator<<(std::ostream& os, const Structure& str) {
-    os << "[Structure: " << str.name 
-       << "]";
-    return os;
-}
-
-
-
+std::ostream& operator<<(std::ostream& os, const Structure& r);
 #endif

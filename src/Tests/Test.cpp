@@ -90,21 +90,23 @@ void test_map_generator(){
     time_manager.stop();
     std::cout << "Simulation terminée." << std::endl;
 }
+*/
 
 void test_noise_visualisation() {
     const int nb_cases = 300;
-    const int case_size = 3;
+    const int case_size = 4;
     const int size_px = nb_cases * case_size;
 
     sf::RenderWindow window(sf::VideoMode(size_px, size_px), "Carte Biomes Alt/Hum");
 
-    BiomeManager::load_biomes();
     NoiseGenerator generator(new NoiseParam);
 
     sf::Image image;
     image.create(size_px, size_px);
 
-    std::map<std::string, sf::Color> biome_colors = {
+    TerrainManager::print_liste_terrain();
+
+    std::map<std::string, sf::Color> terrain_colors = {
         {"eau", sf::Color(0, 0, 255)},             // bleu
         {"sable", sf::Color(240, 240, 100)},       // jaune clair
         {"plaine", sf::Color(180, 255, 100)},      // vert clair
@@ -121,8 +123,9 @@ void test_noise_visualisation() {
             alt = (alt + 1.0f) / 2.0f;
             hum = (hum + 1.0f) / 2.0f;
 
-            Biome* b = BiomeManager::get_best_biome(alt, hum);
-            sf::Color color = biome_colors.count(b->name) ? biome_colors[b->name] : biome_colors["defaut"];
+            Terrain* b = TerrainManager::get_best_terrain(alt, hum);
+
+            sf::Color color = terrain_colors.count(b->name) ? terrain_colors[b->name] : terrain_colors["defaut"];
 
             for (int dx = 0; dx < case_size; ++dx)
                 for (int dy = 0; dy < case_size; ++dy)
@@ -140,7 +143,73 @@ void test_noise_visualisation() {
 
     sf::sleep(sf::seconds(100));
 }
-*/
+
+void test_map_generator_visualisation() {
+    print_primaire("test_map_generator_visualisation");
+    const int nb_cases = CHUNK_SIZE;
+    const int case_size = 10;
+    const int size_px = nb_cases * case_size;
+
+    sf::RenderWindow window(sf::VideoMode(size_px, size_px), "Carte Biomes Alt/Hum");
+
+    MapGenerator generator(new NoiseParam,{0,0});
+
+    Chunk* chu=generator.generate_chunk(0,0);
+
+    sf::Image image;
+    image.create(size_px, size_px);
+
+    TerrainManager::print_liste_terrain();
+
+    std::map<std::string, sf::Color> terrain_colors = {
+        {"eau", sf::Color(0, 0, 255)},             // bleu
+        {"sable", sf::Color(240, 240, 100)},       // jaune clair
+        {"plaine", sf::Color(180, 255, 100)},      // vert clair
+        {"herbe", sf::Color(0, 150, 0)},           // vert
+        {"roche", sf::Color(80, 80, 80)},          // gris
+        {"montagne", sf::Color(0, 0, 0)},          // noir
+        {"defaut", sf::Color(255, 0, 255)}         // rose fluo (erreur)
+    };
+
+    std::string te="";
+    for (int x = 0; x < nb_cases; ++x) {
+        for (int y = 0; y < nb_cases; ++y) {
+
+            te=chu->at(x,y)->get_terrain()->name;
+            sf::Color color = terrain_colors.count(te) ? terrain_colors[te] : terrain_colors["defaut"];
+            print_primaire(te);
+            for (int dx = 0; dx < case_size; ++dx)
+                for (int dy = 0; dy < case_size; ++dy)
+                    image.setPixel(x * case_size + dx, y * case_size + dy, color);
+        }
+    }
+
+    sf::Texture texture;
+    texture.loadFromImage(image);
+    sf::Sprite sprite(texture);
+
+    window.clear();
+    window.draw(sprite);
+    window.display();
+
+    sf::sleep(sf::seconds(100));
+}
+
+void mini_test_Map_Manager(){
+    print_primaire("!!! mini_test_Map_Manager !!!");
+
+    TimeManager time_manager(2);
+    start_Time_Manager(time_manager);
+    
+    MapManager map_manager("mini_test", time_manager);
+    start_Map_Manager(map_manager);
+    sf::sleep(sf::seconds(2));
+
+    sf::sleep(sf::seconds(1));
+    time_manager.stop();
+    sf::sleep(sf::seconds(0.4));
+    print_primaire("Simulation terminée.");
+}
 
 void test_Map_Manager() {
     print_primaire("Debut Simulation.");
@@ -163,6 +232,7 @@ void test_Map_Manager() {
     print_status(true,"On demande a load");
     map_manager.demander_load_chunk(50,50);
     map_manager.demander_load_chunk(51,50);
+    sf::sleep(sf::seconds(1));
     map.print_chunks_load();
     print_status(false,"On demande a load");
 
@@ -170,9 +240,9 @@ void test_Map_Manager() {
     sf::sleep(sf::seconds(2));
     print_status(true,"On demande a deload");
     map_manager.demander_deload_chunk(51,50);
+    sf::sleep(sf::seconds(0.2));
     map.print_chunks_load();
     print_status(false,"On demande a deload");
-
     
     print_secondaire("Wait");
     sf::sleep(sf::seconds(0.1));
@@ -193,11 +263,12 @@ void test_ressource_manager() {
     Entite ent;
 
     if (eau) {
-        for(int i=0;i<2;i++){
+        for(int i=0;i<20;i++){
             c.update();
             tmp = c.get_ressource();
             if(tmp)tmp->consommer(&ent,c);
             else print_error("Pas de ressource dans la case ressource.");
+            c.update();
         }
     } else {
         print_error("ressource inconnue.");
@@ -212,7 +283,7 @@ void test_ressource_manager() {
 
 int main_test(){
     print_primaire("!!! MODE TEST !!!");
-    test_ressource_manager();
+    test_noise_visualisation();
     print_primaire("!!! FIN MODE TEST !!!");
     return 0;
 }

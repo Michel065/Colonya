@@ -4,7 +4,6 @@ Case::Case(){}
 Case::~Case() {
     if(ressource)delete ressource;
     if(structure)delete structure;
-    if(terrain)delete terrain;
     terrain=nullptr;
     ressource=nullptr;
     structure=nullptr;

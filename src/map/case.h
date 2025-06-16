@@ -5,7 +5,7 @@
 
 #include "../Terrain/TerrainManager.h"
 #include "../Ressource/RessourceManager.h"
-#include "../Structure/Structure.h"
+#include "../Structure/StructureManager.h"
 
 class Case {
 private:
@@ -61,8 +61,11 @@ inline void from_json(const json& j, Case& c) {
         c.set_ressource(r,true);
     }
 
-    if (j.contains("structure") && !j["structure"].is_null())
-        c.set_structure(new Structure(j.at("structure").get<Structure>()),true);
+    if (j.contains("structure") && !j["structure"].is_null()){
+        Structure* r=nullptr;
+        from_json(j.at("structure"), r);
+        c.set_structure(r,true);
+    }
 }
 
 // Surcharge de l'opérateur <<
