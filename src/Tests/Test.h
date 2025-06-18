@@ -11,6 +11,8 @@
 #include "../Ressource/all_ressource.h"
 #include "../Terrain/all_terrain.h"
 
+#include "../Tool/Stockage.h"
+
 int main_test();
 
 #endif

@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <unordered_set>
 #include <unordered_map>
+#include <deque>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;

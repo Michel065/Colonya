@@ -34,17 +34,21 @@ struct AutoRegisterStructure {
 
 
 
-inline void to_json(json& j, const Structure& r) {
+inline void to_json(json& j, const Structure& s) {
     j = json{
-        {"type", r.get_type()},
+        {"type", s.get_type()},
+        {"data", s.get_json()},
     };
 }
 
 
-inline void from_json(const json& j, Structure*& r) {
+inline void from_json(const json& j, Structure*& s) {
     StructureType type;
     j.at("type").get_to(type);
-    r = StructureManager::creer(type);
+    s = StructureManager::creer(type);
+    if (s && j.contains("data"))
+        s->from_json(j["data"]);
+
 }
 
 

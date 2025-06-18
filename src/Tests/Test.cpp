@@ -280,10 +280,74 @@ void test_ressource_manager() {
     std::cout << "JSON de la case avec eau :\n" << j.dump(4) << std::endl;
 }
 
+void test_stockage() {
+    print_status(true, "test_stockage");
+
+    Stockage stockage(3);
+    print_secondaire("→ Création d’un stockage capacité 3");
+
+    Ressource* r1 = RessourceManager::creer(RessourceType::EAU);
+    Ressource* r2 = RessourceManager::creer(RessourceType::EAU);
+    Ressource* r3 = RessourceManager::creer(RessourceType::EAU);
+    Ressource* r4 = RessourceManager::creer(RessourceType::EAU);
+
+    print_secondaire("→ Ajout de 3 ressources (limite atteinte à 3)");
+    stockage.ajouter(r1) ? print_primaire("  ✓ Ajout r1") : print_error("  ✗ Échec ajout r1");
+    stockage.ajouter(r2) ? print_primaire("  ✓ Ajout r2") : print_error("  ✗ Échec ajout r2");
+    stockage.ajouter(r3) ? print_primaire("  ✓ Ajout r3") : print_error("  ✗ Échec ajout r3");
+
+    print_secondaire("→ Tentative d’ajout au-delà de la limite");
+    if (!stockage.ajouter(r4)) {
+        print_primaire("  ✓ Rejet correct de r4 car stockage plein");
+        delete r4;
+    } else {
+        print_error("  ✗ r4 ajouté alors que stockage est plein !");
+    }
+
+    print_secondaire("→ Vérification snapshot() et taille()");
+    auto snap = stockage.snapshot();
+    print_primaire("  ✓ Taille actuelle : ", snap.size());
+
+    print_secondaire("→ Retrait de la première ressource");
+    Ressource* retiré = nullptr;
+    if (stockage.retirer(retiré)) {
+        print_primaire("  ✓ Retrait réussi : ", retiré->get_name());
+        delete retiré;
+    } else {
+        print_error("  ✗ Retrait échoué");
+    }
+
+    print_secondaire("→ Vérification après retrait");
+    print_primaire("  ✓ Taille actuelle : ", stockage.taille());
+
+    print_secondaire("→ Test clear()");
+    stockage.clear();
+    print_primaire("  ✓ Stockage vidé, taille : ", stockage.taille());
+
+    print_secondaire("→ Ajout pour test JSON (x2)");
+    stockage.ajouter(RessourceManager::creer(RessourceType::EAU));
+    stockage.ajouter(RessourceManager::creer(RessourceType::EAU));
+
+    print_secondaire("→ Sérialisation JSON");
+    nlohmann::json j = stockage;
+    print_primaire("  ✓ JSON : ", j.dump());
+
+    print_secondaire("→ Désérialisation dans stockage2");
+    Stockage stockage2;
+    from_json(j, stockage2);
+
+    print_primaire("  ✓ Taille de stockage2 : ", stockage2.taille());
+
+    stockage.clear();
+    stockage2.clear();
+
+    print_status(false, "test_stockage");
+}
+
 
 int main_test(){
     print_primaire("!!! MODE TEST !!!");
-    test_noise_visualisation();
+    test_stockage();
     print_primaire("!!! FIN MODE TEST !!!");
     return 0;
 }

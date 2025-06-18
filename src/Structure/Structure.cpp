@@ -8,6 +8,10 @@ StructureType Structure::get_type() const {
     return type;
 }
 
+StructureState Structure::get_state()const{
+    return state;
+}
+
 std::string Structure::get_texture(){
     return StructureInfoManager::get_info(type).texture_path;
 }
@@ -36,10 +40,11 @@ void Structure::set_time_manager(TimeManager* time){
 
 Structure& Structure::operator=(const Structure& other) {
     type = other.get_type();
+    set_from_structure(other);
     return *this;
 }
 
 std::ostream& operator<<(std::ostream& os, const Structure& r) {
-    os << "[Structure: type=" << r.get_name() << "]";
+    os << "[Structure: name=" << r.get_name() << r.get_print_string() << "]";
     return os;
 }

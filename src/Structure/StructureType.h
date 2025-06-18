@@ -5,4 +5,11 @@ enum StructureType {
     HUB,
 };
 
+enum StructureState {
+    EN_CONSTRUCTION,
+    FONCTIONNEL,
+    FERME,
+    EN_DESTRUCTION,
+};
+
 #endif
