@@ -1,11 +1,11 @@
 #include "MapGenerator.h"
 
 MapGenerator::MapGenerator(NoiseParam* par,std::pair<int, int> chunk_spaw):noisegenerator(par),chunk_spawn(chunk_spaw){
-    liste_des_biomes=BiomeManager::get_all_natural_biome();
+    liste_des_terrains=TerrainManager::get_all_natural_terrain();
 }
 
 MapGenerator::MapGenerator():noisegenerator(new NoiseParam),chunk_spawn({0,0}){
-    liste_des_biomes=BiomeManager::get_all_natural_biome();
+    liste_des_terrains=TerrainManager::get_all_natural_terrain();
 }
 
 NoiseParam* MapGenerator::get_param(){
@@ -26,7 +26,7 @@ Chunk* MapGenerator::generate_chunk(int chunk_x, int chunk_y) const{
             hum = (hum + 1.0f) / 2.0f;
             
             Case* c =new Case;
-            c->set_biome(BiomeManager::get_best_biome(alt, hum));
+            c->set_terrain(TerrainManager::get_best_terrain(alt, hum));
             chunk->set_case(x, y, c);
         }
     }

@@ -3,13 +3,13 @@
 
 #include "../Commun/includes.h"
 
-#include "./BiomeManager.h"
+#include "../Terrain/TerrainManager.h"
 #include "../Ressource/RessourceManager.h"
-#include "../Structure/Structure.h"
+#include "../Structure/StructureManager.h"
 
 class Case {
 private:
-    Biome* biome = nullptr;
+    Terrain* terrain = nullptr;
     Ressource* ressource = nullptr;
     Structure* structure = nullptr;
     bool constructible=true;
@@ -17,20 +17,20 @@ public:
     Case();
     ~Case();
 
-    void set_all(Biome* bio, Ressource* re, Structure* st);
+    void set_all(Terrain* ter, Ressource* re, Structure* st);
 
-    void set_biome(Biome* bio);
-    bool set_ressource(Ressource* bio,bool force=false);
-    bool set_structure(Structure* bio,bool force=false);
+    void set_terrain(Terrain* ter);
+    bool set_ressource(Ressource* ter,bool force=false);
+    bool set_structure(Structure* ter,bool force=false);
 
-    Biome* get_biome()const;
+    Terrain* get_terrain()const;
     Ressource* get_ressource()const;
     Structure* get_structure()const;
     Ressource* transfert_ressource();// donc plus dans case et recup entiere de la creature
         
     void delete_ressource();
     void delete_structure();
-    void delete_biome();
+    void delete_terrain();
 
     void update();
 
@@ -39,7 +39,7 @@ public:
 
 // JSON serialization
 inline void to_json(json& j, const Case& c) {
-    j["biome"] = c.get_biome();
+    j["terrain"] = c.get_terrain();
     
     Ressource * tmp=c.get_ressource();
     if (tmp) j["ressource"] = *tmp;
@@ -51,9 +51,9 @@ inline void to_json(json& j, const Case& c) {
 }
 
 inline void from_json(const json& j, Case& c) {
-    Biome* b = nullptr;
-    j.at("biome").get_to(b);
-    c.set_biome(b); 
+    Terrain* b = nullptr;
+    j.at("terrain").get_to(b);
+    c.set_terrain(b); 
 
     if (j.contains("ressource") && !j["ressource"].is_null()){
         Ressource* r=nullptr;
@@ -61,14 +61,17 @@ inline void from_json(const json& j, Case& c) {
         c.set_ressource(r,true);
     }
 
-    if (j.contains("structure") && !j["structure"].is_null())
-        c.set_structure(new Structure(j.at("structure").get<Structure>()),true);
+    if (j.contains("structure") && !j["structure"].is_null()){
+        Structure* r=nullptr;
+        from_json(j.at("structure"), r);
+        c.set_structure(r,true);
+    }
 }
 
 // Surcharge de l'opérateur <<
 inline std::ostream& operator<<(std::ostream& os, const Case& casde) {
     os << "[Case: " 
-       << " | " << *casde.get_biome() 
+       << " | " << *casde.get_terrain() 
        << " | " << *casde.get_ressource()
        << " | " << *casde.get_structure()
        << "]";

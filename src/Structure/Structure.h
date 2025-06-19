@@ -2,37 +2,46 @@
 #define _STRUCTURE_H 
 
 #include "../Commun/includes.h"
+#include "../Synchronisation/TimeManager.h"
+
+#include "./StructureType.h"
+#include "./StructureInfoManager.h"
+#include "../Entite/Entite.h"
 
 struct Case;
 
-struct Structure {
-    int name;
+class Structure {
+protected:
+    StructureType type;
+    std::atomic<int> nbr_coup_avant_fin_construction;
+    StructureState state;
+    TimeManager* time_manager=nullptr;
+
+public:
+    Structure(StructureType t, int nbr_coup_avant_fin_constructio = 0, StructureState stat=StructureState::EN_CONSTRUCTION) : type(t), nbr_coup_avant_fin_construction(nbr_coup_avant_fin_constructio), state(stat) {}
+    Structure(const Structure& other);
+    virtual ~Structure() = default;
+
+    StructureType get_type()const;
+    StructureState get_state()const;
+    void set_time_manager(TimeManager* time);
+
+    //recup en rappor avec les info fixe
+    std::string get_texture();
+    std::string get_name()const;
+    StructureInfo& get_info();
     
-    Structure(){};
-    void update(Case& c){}
+    virtual void update(Case& c) = 0;
 
-    Structure* clone() const {
-        Structure* copy = new Structure();
-        copy->name = name;
-        return copy;
-    }
+    virtual nlohmann::json get_json()const = 0;
+    virtual void from_json(nlohmann::json json) = 0;
+    virtual void set_from_structure(const Structure& other) = 0;
+    virtual std::string get_print_string()const = 0;
+
+
+    virtual Structure* clone() const = 0;
+
+    Structure& operator=(const Structure& other);
+    friend std::ostream& operator<<(std::ostream& os, const Structure& r);
 };
-
-inline void to_json(json& j, const Structure& s) {
-    j = json{{"type", s.name}};
-}
-
-inline void from_json(const json& j, Structure& s) {
-    j.at("type").get_to(s.name);
-}
-
-// Surcharge de l'opérateur <<
-inline std::ostream& operator<<(std::ostream& os, const Structure& str) {
-    os << "[Structure: " << str.name 
-       << "]";
-    return os;
-}
-
-
-
 #endif

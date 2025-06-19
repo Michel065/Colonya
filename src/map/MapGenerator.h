@@ -2,7 +2,7 @@
 #define _MAP_GENERATOR_H 
 
 #include "../Commun/includes.h"
-#include "Biome.h"
+#include "../Terrain/Terrain.h"
 #include "Chunk.h"
 #include "NoiseGenerator.h"
 
@@ -10,7 +10,7 @@
 class MapGenerator {    
 private:
     NoiseGenerator noisegenerator;
-    std::vector<Biome*> liste_des_biomes;
+    std::vector<Terrain*> liste_des_terrains;
     std::pair<int, int> chunk_spawn = {0, 0};
 
 public:

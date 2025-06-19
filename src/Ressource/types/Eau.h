@@ -1,5 +1,5 @@
-#ifndef _EAU_H
-#define _EAU_H
+#ifndef _EAU_RESSOURCE_H
+#define _EAU_RESSOURCE_H
 
 #include "../RessourceManager.h"
 

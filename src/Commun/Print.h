@@ -2,7 +2,7 @@
 #define _PRINT_H
 
 #define PRINT_primaire true
-#define PRINT_secondaire false
+#define PRINT_secondaire true
 #define PRINT_test true
 #define PRINT_error true
 #define PRINT_status true

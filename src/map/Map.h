@@ -13,6 +13,7 @@ struct pair_hash {// merci chat
 class Map {
 private:
     std::unordered_map<std::pair<int, int>, Chunk*, pair_hash> loaded_chunks;
+
     mutable std::shared_mutex mutex;
 
     std::pair<int, int> get_chunk_coords(int world_x, int world_y) const;
@@ -22,6 +23,7 @@ private:
 public:
     Chunk * get_chunk(int chunk_x, int chunk_y);
     Case* get_case(int world_x, int world_y);
+    void delete_chunk(Chunk* chu);
     void deload_chunk(int cx, int cy);
     void save_chunk(int chunk_x, int chunk_y);
     void save_all_chunks();
@@ -36,7 +38,6 @@ public:
 
 
     void print_chunks_load();
-    
 };
 
 #endif

@@ -18,6 +18,7 @@ struct NoiseParam
 
 inline void to_json(json& j, const NoiseParam& n) {
     auto conv_f_vers_i = [](float val) -> int { // 5 decimale
+        print_secondaire("conv_f_vers_i, de  base:",val," ce qu'on auvegarde:",std::round(val * 100000));
         return std::round(val * 100000);
     };
     j = json{
@@ -31,8 +32,10 @@ inline void to_json(json& j, const NoiseParam& n) {
 }
 
 inline void from_json(const json& j, NoiseParam& n) {
-    auto conv_i_vers_f = [](int val) -> float { // 5 decimale
-        return std::round(val / 100000);
+    auto conv_i_vers_f = [](int val) -> float {
+        float converted = static_cast<float>(val) / 100000.0f;
+        print_secondaire("conv_i_vers_f, de base:", val, " ce qu'on sauvegarde:", converted);
+        return converted;
     };
     j.at("seed").get_to(n.seed);
     j.at("octaves").get_to(n.octaves);

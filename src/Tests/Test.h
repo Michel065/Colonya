@@ -4,11 +4,14 @@
 
 #include "../Synchronisation/TimeManager.h"
 #include "../Map/MapManager.h"
-#include "../Map/BiomeManager.h"
+#include "../Terrain/TerrainManager.h"
 #include "../Map/MapGenerator.h"
 #include "../Map/Case.h"
 
 #include "../Ressource/all_ressource.h"
+#include "../Terrain/all_terrain.h"
+
+#include "../Tool/Stockage.h"
 
 int main_test();
 
