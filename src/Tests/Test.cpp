@@ -338,6 +338,14 @@ void test_stockage() {
 
     print_primaire("  ✓ Taille de stockage2 : ", stockage2.taille());
 
+    std::vector<RessourceType> liste = stockage2.get_all_ressource();
+
+    print_secondaire("[");
+    for (auto& r : liste) {
+        print_secondaire(r,", ");
+    }
+    print_secondaire("]");
+
     stockage.clear();
     stockage2.clear();
 

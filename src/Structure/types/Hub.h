@@ -1,42 +1,31 @@
 #ifndef _HUB_STRUCTURE_H
 #define _HUB_STRUCTURE_H
 
+#include "../../Commun/includes.h"
+#include "../../Tool/Stockage.h"
 #include "../StructureManager.h"
 
 class Hub : public Structure {
 private:
-    
+    int taille_inv=5;
+    Stockage stockage;
+
 public:
-    Hub() : Structure(StructureType::HUB,
-                      StructureInfoManager::get_info(StructureType::HUB).nbr_de_base_de_coup_avant_fin_construction,
-                      StructureInfoManager::get_info(StructureType::HUB).state_de_base) {}
+    Hub();
+    Hub(const Hub& other);
+    void update(Case& c) override;
+    bool ajouter(Ressource* value);
+    bool retirer_type(RessourceType type, Ressource*& value);
+    bool est_plein() const;
+    std::vector<RessourceType> get_all_ressource() const;
+    nlohmann::json get_json()const override;
+    void from_json(nlohmann::json json) override;
+    void set_from_structure(const Structure& other) override;
+    std::string get_print_string()const override;
 
-
-    void update(Case& c) override {
-        // comportement spécifique, facultatif
-    }
-
-    
-    
-    nlohmann::json get_json()const override {
-
-    }
-    
-    void from_json(nlohmann::json json) override{
-
-    } 
-
-    void set_from_structure(const Structure& other) override{
-        
-    }
-
-    
-    std::string get_print_string()const override{
-        return "";
-    }
 
     Structure* clone() const override {
-        return new Hub(*this);
+        return new Hub();
     }
 
     // Auto-enregistrement
@@ -45,8 +34,7 @@ public:
         StructureType::HUB,
         StructureInfo{
             "Hub",
-            textures_file + "maison.jpg", // pas utilisé pour l'instant mais si on veux ajouter un system de visualisation de case ou d'inventaire ca peux etre sympa
-            0;
+            textures_file + "maison.jpg"
         }
     };
 };

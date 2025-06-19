@@ -20,6 +20,19 @@ public:
         return true;
     }
 
+    bool retirer_type(RessourceType type, Ressource*& value) {
+        std::lock_guard<std::mutex> lock(mtx);
+        for (auto it = data.begin(); it != data.end(); ++it) {
+            if ((*it)->get_type() == type) {
+                value = *it;
+                data.erase(it);
+                return true;
+            }
+        }
+        value = nullptr;
+        return false;
+    }
+
     bool retirer(Ressource*& value) {
         std::lock_guard<std::mutex> lock(mtx);
         if (data.empty()) return false;
