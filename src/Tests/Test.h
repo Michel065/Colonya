@@ -11,7 +11,13 @@
 #include "../Ressource/all_ressource.h"
 #include "../Terrain/all_terrain.h"
 
+//test stockage
 #include "../Tool/Stockage.h"
+
+//test structure hub
+#include "../Structure/all_Structure.h"
+#include "../Structure/StructureType.h"
+
 
 int main_test();
 

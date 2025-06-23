@@ -27,7 +27,7 @@ private:
 public:
     MapManager(std::string name_map,TimeManager& time_manager, NoiseParam* param_generator=nullptr ,std::pair<int, int> chunk_spaw = {0, 0});
     ~MapManager();
-    Map& get_map();
+    Map* get_map();
     void init_map_contexte_file(NoiseParam* param_generator=nullptr);
     void save_map_contexte();
     void load_map_contexte();

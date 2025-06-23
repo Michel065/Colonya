@@ -24,6 +24,7 @@ public:
 
     StructureType get_type()const;
     StructureState get_state()const;
+    void set_state(StructureState sta);
     void set_time_manager(TimeManager* time);
 
     //recup en rappor avec les info fixe
@@ -35,7 +36,7 @@ public:
 
     virtual nlohmann::json get_json()const = 0;
     virtual void from_json(nlohmann::json json) = 0;
-    virtual void set_from_structure(const Structure& other) = 0;
+    virtual void set_from_structure(const Structure& other) = 0;// a voir mais pas forcent utile a sup peux etre
     virtual std::string get_print_string()const = 0;
 
 

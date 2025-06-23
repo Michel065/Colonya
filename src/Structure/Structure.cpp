@@ -12,6 +12,10 @@ StructureState Structure::get_state()const{
     return state;
 }
 
+void Structure::set_state(StructureState sta){
+    state=sta;
+}
+
 std::string Structure::get_texture(){
     return StructureInfoManager::get_info(type).texture_path;
 }

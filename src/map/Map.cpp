@@ -186,3 +186,13 @@ void Map::print_chunks_load(){
     texte+="];";
     print_primaire(texte);
 }
+
+
+
+bool Map::il_fait_jour(){
+    return jour.load();
+}
+
+void Map::inverse_jour(){
+    jour.store(!jour.load());
+}
