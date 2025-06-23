@@ -71,8 +71,8 @@ void MapManager::load_map_contexte() {
     print_status(false,"load map contexte");
 }
 
-Map& MapManager::get_map(){
-    return carte;
+Map* MapManager::get_map(){
+    return &carte;
 }
 
 void MapManager::demander_load_chunk(int x, int y) {

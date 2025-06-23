@@ -12,6 +12,9 @@ struct pair_hash {// merci chat
 
 class Map {
 private:
+
+    std::atomic<bool> jour=true; // pour savoir l'etat de la jouréne
+
     std::unordered_map<std::pair<int, int>, Chunk*, pair_hash> loaded_chunks;
 
     mutable std::shared_mutex mutex;
@@ -38,6 +41,10 @@ public:
 
 
     void print_chunks_load();
+
+
+    bool il_fait_jour();
+    void inverse_jour();
 };
 
 #endif

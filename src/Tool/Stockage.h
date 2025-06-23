@@ -85,9 +85,33 @@ public:
         data.clear();
     }
 
+    std::string stringifie() const{
+        std::lock_guard<std::mutex> lock(mtx);
+        std::string result="[";
+        for (auto& r : data) {
+            result+=r->get_name()+", ";
+        }
+        result+="]";
+        return result;
+    }
+
     friend void to_json(nlohmann::json& j, const Stockage& s);
     friend void from_json(const nlohmann::json& j, Stockage& s);
 
+    Stockage* clone(){
+        Stockage* tmp=new Stockage(static_cast<int>(capacite_max));
+        for (auto& r : data) {
+            tmp->ajouter(r->clone());
+        }
+        return tmp;
+    }
+
+    void copy_from(const Stockage* tmp){
+        clear();
+        for (auto& r : tmp->snapshot()) {
+            ajouter(r->clone());
+        }
+    }
 };
 
 
@@ -96,7 +120,7 @@ inline void to_json(nlohmann::json& j, const Stockage& s) {
     j["capacite"] = s.capacite_max;
     j["data"] = nlohmann::json::array();
     for (const auto* r : s.data) {
-        j["data"].push_back(*r); // utilise ton to_json(const Ressource&)
+        j["data"].push_back(*r);
     }
 }
 
@@ -106,7 +130,7 @@ inline void from_json(const nlohmann::json& j, Stockage& s) {
     j.at("capacite").get_to(s.capacite_max);
     for (const auto& rjson : j.at("data")) {
         Ressource* r = nullptr;
-        from_json(rjson, r); // utilise ton from_json(json, Ressource*&)
+        from_json(rjson, r);
         if (r) s.data.push_back(r);
     }
 }

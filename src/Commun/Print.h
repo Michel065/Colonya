@@ -48,7 +48,7 @@ inline void print_secondaire_attention(const Args&... args) {
 template<typename... Args>
 inline void print_error(const Args&... args) {
     if constexpr (PRINT_error) {
-        std::cout << COLOR_RED;
+        std::cout << COLOR_RED<<"Erreur:";
         (std::cout << ... << args);
         std::cout << COLOR_RESET << std::endl;
     }

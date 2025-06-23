@@ -35,10 +35,9 @@ struct AutoRegisterStructure {
 
 
 inline void to_json(json& j, const Structure& s) {
-    j = json{
-        {"type", s.get_type()},
-        {"data", s.get_json()},
-    };
+    j["type"] = s.get_type();
+    j["etat"] = static_cast<int>(s.get_state());
+    j["data"] = s.get_json(); // délègue aux enfants
 }
 
 
@@ -46,10 +45,16 @@ inline void from_json(const json& j, Structure*& s) {
     StructureType type;
     j.at("type").get_to(type);
     s = StructureManager::creer(type);
-    if (s && j.contains("data"))
-        s->from_json(j["data"]);
 
+    if (!s) return;
+
+    if (j.contains("etat"))
+        s->set_state(static_cast<StructureState>(j["etat"].get<int>()));
+
+    if (j.contains("data"))
+        s->from_json(j["data"]);
 }
+
 
 
 #endif

@@ -223,7 +223,7 @@ void test_Map_Manager() {
     sf::sleep(sf::seconds(2));
 
     print_status(true,"Get Map manager + print");
-    Map& map = map_manager.get_map();
+    Map& map = *map_manager.get_map();
     map.print_chunks_load();
     print_status(false,"Get Map manager + print");
 
@@ -352,10 +352,91 @@ void test_stockage() {
     print_status(false, "test_stockage");
 }
 
+void test_hub() {
+    print_status(true, "test_hub");
+    print_status(true,"Init map vide");
+    Map* map = new Map;
+    print_status(false,"Init map vide");
+
+    // Setup
+    Hub hub(map);
+    Entite* e1 = new Entite("Bob");
+    Entite* e2 = new Entite("Alice");
+
+    Ressource* r1 = RessourceManager::creer(RessourceType::EAU);
+    Ressource* r2 = RessourceManager::creer(RessourceType::EAU);
+
+    print_secondaire("→ Ajout de ressources dans le Hub");
+    hub.ajouter(r1) ? print_primaire("  ✓ Ajout r1") : print_error("  ✗ Ajout r1 échoué");
+    hub.ajouter(r2) ? print_primaire("  ✓ Ajout r2") : print_error("  ✗ Ajout r2 échoué");
+
+    print_secondaire("→ Entrée d'entités");
+    hub.entrer(e1) ? print_primaire("  ✓ Bob est entré") : print_error("  ✗ Bob a été refusé");
+    hub.entrer(e2) ? print_primaire("  ✓ Alice est entrée") : print_error("  ✗ Alice a été refusée");
+
+    print_secondaire("→ Test fonction dormir");
+    if (hub.dormir(e1)) print_primaire("  ✓ Bob a dormi");
+    else print_error("  ✗ Bob n'a pas pu dormir");
+
+    print_secondaire("→ Vérification entités présentes");
+    auto liste = hub.get_liste_des_entite_presente();  // type : std::vector<Entite*>
+    for (auto* e : liste) {
+        print("   - ", e->get_name());
+    }
+
+    print_secondaire("→ Sauvegarde JSON");
+    nlohmann::json j = hub.get_json();
+    print_primaire("  ✓ JSON : ", j.dump());
+
+    print_secondaire("→ Chargement depuis JSON");
+    Hub hub2;
+    hub2.from_json(j);
+
+    print_secondaire("→ Résumé hub2 :");
+    print(hub2.get_print_string());
+
+    // Nettoyage (manuellement car pas encore smart_ptr)
+    delete e1;
+    delete e2;
+
+    print_status(false, "test_hub");
+}
+
+void test_structure_serialisation() {
+    print_status(true, "test_structure_serialisation");
+
+    // Création d’un Hub
+    Hub* hub = new Hub();
+    hub->ajouter(RessourceManager::creer(RessourceType::EAU));
+    Entite* e = new Entite("Jean");
+    hub->entrer(e);
+
+    print_secondaire("→ JSON initial du Hub");
+    json j = *hub;
+    print_primaire("  ✓ JSON : ", j.dump());
+
+    print_secondaire("→ Reconstruction via Structure*");
+    Structure* structure = nullptr;
+    from_json(j, structure);
+
+    if (structure) {
+        print_primaire("  ✓ Structure reconstruite");
+        print(structure->get_print_string());
+    } else {
+        print_error("  ✗ Reconstruction échouée !");
+    }
+
+    delete hub;
+    delete e;
+    delete structure;
+
+    print_status(false, "test_structure_serialisation");
+}
+
 
 int main_test(){
     print_primaire("!!! MODE TEST !!!");
-    test_stockage();
+    test_hub();
     print_primaire("!!! FIN MODE TEST !!!");
     return 0;
 }
