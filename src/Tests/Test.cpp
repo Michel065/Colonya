@@ -433,10 +433,17 @@ void test_structure_serialisation() {
     print_status(false, "test_structure_serialisation");
 }
 
+void test_display(){
+    print_status(true, "test_display");
+
+    
+
+    print_status(false, "test_display");
+}
 
 int main_test(){
     print_primaire("!!! MODE TEST !!!");
-    test_hub();
+    test_display();
     print_primaire("!!! FIN MODE TEST !!!");
     return 0;
 }
