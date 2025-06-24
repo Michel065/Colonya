@@ -436,8 +436,9 @@ void test_structure_serialisation() {
 void test_display(){
     print_status(true, "test_display");
 
+    DisplayManager fenetre;
+    fenetre.run();
     
-
     print_status(false, "test_display");
 }
 

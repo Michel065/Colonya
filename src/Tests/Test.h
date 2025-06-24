@@ -18,6 +18,8 @@
 #include "../Structure/all_Structure.h"
 #include "../Structure/StructureType.h"
 
+//display
+#include "../Display/DisplayManager.h"
 
 int main_test();
 
