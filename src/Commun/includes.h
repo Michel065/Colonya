@@ -37,6 +37,7 @@ namespace fs = std::filesystem;
 
 //using namespace std;
 
+namespace fs = std::filesystem;
 
 // define de va global
 
@@ -47,6 +48,7 @@ namespace fs = std::filesystem;
 extern std::string textures_file;
 extern std::string worlds_file;
 extern std::string world_file;
+extern std::string police_source;
 
 
 #endif
