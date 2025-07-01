@@ -2,7 +2,7 @@
 
 MapManager::MapManager(std::string name_map, TimeManager& tm, NoiseParam* param_generator,std::pair<int, int> chunk_spaw) : name_map(name_map),time_manager(&tm) {  
     world_file=worlds_file+name_map;
-    chunk_spawn=chunk_spaw;
+    chunk_spawn=chunk_spaw;// c pas vraiment bon si on change le spawn en chargant une carte eistante ca peux faire des bug donc a revoir mais pas prioritaire
     if (fs::exists(world_file)) {
         print_primaire("Le monde ",world_file," existe.");
     } else {

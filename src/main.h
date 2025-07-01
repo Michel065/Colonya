@@ -6,9 +6,6 @@
 #include "./Map/MapManager.h"
 #include "./Tests/Test.h"
 
-void start_simu();
-
-
 
 
 #endif

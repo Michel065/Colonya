@@ -62,6 +62,15 @@ inline void print_status(bool in_progress, const Args&... args) {
     std::cout << (in_progress ? " ..." : " Done!") << COLOR_RESET << std::endl;
 }
 
+template<typename... Args>
+inline void print_test(const Args&... args) {
+    if constexpr (PRINT_error) {
+        std::cout << COLOR_PINK<<"Test:";
+        (std::cout << ... << args);
+        std::cout << COLOR_RESET << std::endl;
+    }
+}
+
 // le par default non controlable
 template<typename... Args>
 inline void print(const Args&... args) {
