@@ -9,6 +9,8 @@ DisplayManager::DisplayManager()
     screens.push_back(new MenuScreen(font));
     screens.push_back(new NewWorldScreen(font));
     screens.push_back(new LoadWorldScreen(font));
+    screen_de_la_simu=new SimuWorldScreen(font);
+    screens.push_back(screen_de_la_simu);
 }
 
 DisplayManager::~DisplayManager() {
@@ -75,3 +77,8 @@ void DisplayManager::close() {
 void DisplayManager::set_screen(Screen_enum new_screen) {
     current_screen = new_screen;
 }
+
+void DisplayManager::set_simu_in_simu_screen(Simulation*simu){
+    screen_de_la_simu->set_simulation(simu,this);
+}
+

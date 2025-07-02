@@ -42,11 +42,14 @@ void Map::deload_chunk(int chunk_x, int chunk_y) {
         print_secondaire_attention("Chunk de spawn protégé, non déchargé.");
         return;
     }
+    
     std::lock_guard<std::shared_mutex> lock(mutex);
     auto it = loaded_chunks.find({chunk_x, chunk_y});
     if (it != loaded_chunks.end()) {
         Chunk* chunk = it->second;
-        
+
+        chunk->supp_user();
+
         if (!chunk->il_y_a_des_user()) {
             loaded_chunks.erase(it);
             delete_chunk(chunk);
@@ -100,10 +103,13 @@ bool Map::chunk_deja_load(int chunk_x, int chunk_y){
     return false;
 }
 
-void Map::load_chunk(int chunk_x, int chunk_y) {
+void Map::load_chunk(int chunk_x, int chunk_y) {// on av ajouter les gent quand il veul le load 
     print_secondaire("load chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " ...");
 
-    if(chunk_deja_load(chunk_x, chunk_y))return;
+    if(chunk_deja_load(chunk_x, chunk_y)){
+        add_user_to_chunk(chunk_x, chunk_y);
+        return;
+    }
 
     std::string path = world_file + "/" + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + ".json";
 
@@ -123,7 +129,8 @@ void Map::load_chunk(int chunk_x, int chunk_y) {
     Chunk* chunk = new Chunk;
     from_json(chunk_json, *chunk);
     {
-        std::unique_lock lock(mutex); // 🔒
+        std::unique_lock lock(mutex);
+        chunk->add_user();
         loaded_chunks[{chunk_x, chunk_y}] = chunk;
     }
     print_secondaire("chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + ", Done");
@@ -195,4 +202,21 @@ bool Map::il_fait_jour(){
 
 void Map::inverse_jour(){
     jour.store(!jour.load());
+}
+
+
+void Map::add_user_to_chunk(int chunk_x, int chunk_y) {
+    std::shared_lock lock(mutex); 
+    auto it = loaded_chunks.find({chunk_x, chunk_y});
+    if (it != loaded_chunks.end()) {
+        it->second->add_user();
+    }
+}
+
+void Map::supp_user_to_chunk(int chunk_x, int chunk_y) {
+    std::shared_lock lock(mutex); 
+    auto it = loaded_chunks.find({chunk_x, chunk_y});
+    if (it != loaded_chunks.end()) {
+        it->second->supp_user();
+    }
 }

@@ -8,13 +8,15 @@
 #include "../tool/TextLabel.h"
 #include "../tool/ScrollableButtonList.h"
 
+#include "../../Simu/Simu.h"
+
 class LoadWorldScreen : public Screen {
 private:
     void charger_mondes();
     
     std::vector<Tool*> tools;
     ScrollableButtonList liste_boutons;
-    std::string monde_selectionne;
+    std::string monde_selectionne="";
 
 public:
     LoadWorldScreen(const sf::Font& font);

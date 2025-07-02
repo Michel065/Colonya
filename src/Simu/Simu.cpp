@@ -69,6 +69,11 @@ SimulationState Simulation::get_state() {
     return simu_state;
 }
 
+std::string Simulation::get_name(){
+    return name;
+}
+
+
 void Simulation::set_time_speed(int timespeed) {
     if (time_manager) time_manager->setTimeSpeed(timespeed);
 }

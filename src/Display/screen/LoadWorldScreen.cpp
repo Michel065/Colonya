@@ -37,6 +37,14 @@ void LoadWorldScreen::draw(sf::RenderWindow& window) const {
 }
 
 int LoadWorldScreen::handle_click(sf::Vector2f mouse_pos, DisplayManager* manager) {
+    liste_boutons.handle_click(mouse_pos);
+
+    std::string selection = liste_boutons.get_selected_label();
+    if (!selection.empty()) {
+        monde_selectionne = selection;
+        std::cout << "[Sélection] Monde = " << monde_selectionne << "\n";
+    }
+    
     for (auto* tool : tools) {
         tool->lose_focus();
         if (tool->is_hovered(mouse_pos)) {
@@ -49,21 +57,18 @@ int LoadWorldScreen::handle_click(sf::Vector2f mouse_pos, DisplayManager* manage
                     return -1;
                 }
                 if (label == "Load") {
-                    std::cout << "[TODO] Charger le monde sélectionné\n";
+                    if (monde_selectionne.empty()) {
+                        print_error("Aucun monde sélectionné.");
+                        return -1;
+                    }
+                    print_primaire("Chargement du monde sélectionné (", monde_selectionne, ")");
+                    Simulation* simu=new Simulation(monde_selectionne);
+                    if (manager) manager->set_simu_in_simu_screen(simu);
                     if (manager) manager->set_screen(Screen_enum::Simu);
                 }
             }
         }
     }
-
-    liste_boutons.handle_click(mouse_pos);
-
-    std::string selection = liste_boutons.get_selected_label();
-    if (!selection.empty()) {
-        monde_selectionne = selection;
-        std::cout << "[Sélection] Monde = " << monde_selectionne << "\n";
-    }
-
     return -1;
 }
 

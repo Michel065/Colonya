@@ -4,12 +4,7 @@
 #include "../Commun/includes.h"
 #include "./Synchronisation/TimeManager.h"
 #include "./Map/MapManager.h"
-
-enum SimulationState {
-    Running,
-    Starting,
-    Closed,
-};
+#include "SimulationState.h"
 
 void start_Time_Manager(TimeManager &tm);
 void start_Map_Manager(MapManager &mm);
@@ -33,6 +28,7 @@ public:
     bool stop();
 
     SimulationState get_state();
+    std::string get_name();
     void set_time_speed(int timespeed);
     void pause();
     void reprise();

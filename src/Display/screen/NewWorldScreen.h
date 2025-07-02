@@ -5,6 +5,7 @@
 #include "../tool/Tool.h"
 #include "Screen.h"
 #include "../../Map/NoiseGenerator.h"
+#include "../../Simu/Simu.h"
 
 class DisplayManager;
 

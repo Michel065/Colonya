@@ -32,7 +32,9 @@ public:
     void save_map_contexte();
     void load_map_contexte();
     void demander_load_chunk(int x, int y);
+    void demander_load_chunk(const std::vector<std::pair<int, int>>& chunks);
     void demander_deload_chunk(int x, int y);
+    void demander_deload_chunk(const std::vector<std::pair<int, int>>& chunks);
 
     bool chunk_existe(int x, int y);
     void create_chunk(int x, int y);

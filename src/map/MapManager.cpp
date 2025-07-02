@@ -91,6 +91,27 @@ void MapManager::demander_deload_chunk(int x, int y) {
     time_manager->signal_event(); // réveille le thread si besoin
 }
 
+void MapManager::demander_load_chunk(const std::vector<std::pair<int, int>>& chunks) {
+    {
+        std::lock_guard<std::mutex> lock(mtx_chunks);
+        for (const auto& c : chunks) {
+            chunks_a_load_share.emplace_back(c);
+        }
+    }
+    time_manager->signal_event();
+}
+
+void MapManager::demander_deload_chunk(const std::vector<std::pair<int, int>>& chunks) {
+    {
+        std::lock_guard<std::mutex> lock(mtx_chunks);
+        for (const auto& c : chunks) {
+            chunks_a_deload_share.emplace_back(c);
+        }
+    }
+    time_manager->signal_event();
+}
+
+
 bool MapManager::chunk_existe(int x, int y){
     return fs::exists(world_file+"/"+std::to_string(x)+"x"+std::to_string(y)+".json");
 }

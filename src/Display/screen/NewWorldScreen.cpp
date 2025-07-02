@@ -123,16 +123,19 @@ int NewWorldScreen::handle_click(sf::Vector2f mouse_pos, DisplayManager* manager
                         return -1;
                     }
 
-                    NoiseParam param;
-                    param.seed              = static_cast<unsigned int>(dynamic_cast<InputInt*>(tools[2])->get_value());
-                    param.octaves           = dynamic_cast<InputInt*>(tools[3])->get_value();
-                    param.persistence       = dynamic_cast<InputFloat*>(tools[4])->get_value();
-                    param.scale_altitude    = dynamic_cast<InputFloat*>(tools[5])->get_value();
-                    param.scale_humidity    = dynamic_cast<InputFloat*>(tools[6])->get_value();
-                    param.decalage_humidity = dynamic_cast<InputInt*>(tools[7])->get_value();
+                    NoiseParam* param=new NoiseParam;
+                    param->seed              = static_cast<unsigned int>(dynamic_cast<InputInt*>(tools[2])->get_value());
+                    param->octaves           = dynamic_cast<InputInt*>(tools[3])->get_value();
+                    param->persistence       = dynamic_cast<InputFloat*>(tools[4])->get_value();
+                    param->scale_altitude    = dynamic_cast<InputFloat*>(tools[5])->get_value();
+                    param->scale_humidity    = dynamic_cast<InputFloat*>(tools[6])->get_value();
+                    param->decalage_humidity = dynamic_cast<InputInt*>(tools[7])->get_value();
 
-                    std::cout << "[Generation] seed = " << param.seed << ", fichier = " << filename << "\n";
-                    // TODO : appeler manager->generate_new_world(filename, param);
+                    std::cout << "[Generation] seed = " << param->seed << ", fichier = " << filename << "\n";
+                    
+                    Simulation* simu=new Simulation(filename,param);
+                    if (manager) manager->set_simu_in_simu_screen(simu);
+                    if (manager) manager->set_screen(Screen_enum::Simu);
                 }
             }
         }
