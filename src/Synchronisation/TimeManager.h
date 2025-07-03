@@ -10,7 +10,7 @@ private:
     bool running;
     int ticksPerSecond;
     unsigned long date=0;
-    unsigned long duree_simulation=100;
+    unsigned long duree_simulation=1000 ;
     std::chrono::milliseconds tickDuration;
     std::chrono::steady_clock::time_point lastTickTime;
     std::mutex mtx,pause_mutex;

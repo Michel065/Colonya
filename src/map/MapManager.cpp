@@ -126,8 +126,9 @@ void MapManager::create_chunk(int x, int y){
 }
 
 void MapManager::load_chunk(int x, int y){
-    print_secondaire("load chunk ",x,"x",y);
+    print_secondaire("load chunk dans map manager ",x,"x",y);
     if(!chunk_existe(x,y)){
+        print_secondaire_attention("chunk non existant,creation de ",x,"x",y," en json");
         create_chunk(x,y);
     }
     verif_et_creer_autour_chunk(x,y);

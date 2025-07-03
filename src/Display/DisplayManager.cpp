@@ -29,6 +29,14 @@ void DisplayManager::run() {
 void DisplayManager::handle_events() {
     sf::Event event;
     while (window.pollEvent(event)) {
+        // Transmettre tous les événements à l'écran actif
+        for (auto* screen : screens) {
+            if (screen->is_active(current_screen)) {
+                screen->handle_event(event);
+            }
+        }
+
+        // Gestion globale
         if (event.type == sf::Event::Closed)
             window.close();
 
@@ -40,14 +48,6 @@ void DisplayManager::handle_events() {
             for (auto* screen : screens) {
                 if (screen->is_active(current_screen)) {
                     screen->handle_click(mouse_pos, this);
-                }
-            }
-        }
-
-        if (event.type == sf::Event::TextEntered) {
-            for (auto* screen : screens) {
-                if (screen->is_active(current_screen)) {
-                    screen->handle_event(event); // pour gérer l’input texte
                 }
             }
         }

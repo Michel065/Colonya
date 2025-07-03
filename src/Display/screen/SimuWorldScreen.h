@@ -7,36 +7,39 @@
 #include "../tool/Button.h"
 
 #include "../../Simu/Simu.h"
-
 #include "../../Map/Map.h"
 
 class SimuWorldScreen : public Screen {
 private:
+    // Vue SFML utilisée uniquement pour afficher (ne déplace plus la caméra)
     sf::View vue;
-    float zoom_level = 1.f;// soit 10case de large
-    sf::Vector2f camera_position;
+    float zoom_level = 1.f;
 
     std::vector<Tool*> tools;
     Button* stop_button;
 
-    //la simualtion
-    Simulation* simulation=nullptr;
-    MapManager* map_manager=nullptr;
+    // Simulation et carte
+    Simulation* simulation = nullptr;
+    MapManager* map_manager = nullptr;
+    Map* carte = nullptr;
 
-    Map*carte=nullptr;
+    // Position logique de la caméra (en cases)
+    int centre_case_x = 9;
+    int centre_case_y = 6;
 
-    void handle_camera_movement(float delta);
-    void handle_zoom(float delta);
-
-    int centre_case_x = 0;
-    int centre_case_y = 0;
-    int largeur_visible_case_demi = 5; // en cases
+    // Taille de la vue visible (moitié du nombre de cases dans chaque direction)
+    int largeur_visible_case_demi = 5;
     int hauteur_visible_case_demi = 5;
-    
+
+    // Chunks actuellement utilisés (affichés)
     std::unordered_map<std::pair<int, int>, Chunk*, pair_hash> chunks_utilises;
 
+    // Fonctions internes
+    void handle_camera_movement(); // plus besoin de delta
+    void handle_zoom(float delta);
+
     void actualiser_chunks_utilises();
-    std::pair<float, float> visu_to_monde(int dx, int dy);
+    std::pair<int, int> visu_to_monde(int dx, int dy);
     std::vector<std::pair<int, int>> calcul_chunks_visibles();
 
 public:
@@ -48,6 +51,8 @@ public:
     void draw(sf::RenderWindow& window) const override;
     int handle_click(sf::Vector2f mouse_pos, DisplayManager* manager) override;
     void handle_event(const sf::Event& event) override;
+
+    void print_chunk_charge();
 };
 
 #endif

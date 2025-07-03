@@ -53,7 +53,13 @@ void Chunk::set_name(int cx,int cy){
 }
 
 void Chunk::add_user() {
+    /*
+    print_primaire("la c bon");
+    print_primaire("Add user appelé sur chunk à ", this);
+    */
     nb_observateurs.fetch_add(1, std::memory_order_relaxed);
+    //print_primaire("la c plus bon");
+
 }
 
 void Chunk::supp_user() {
@@ -62,4 +68,8 @@ void Chunk::supp_user() {
 
 bool Chunk::il_y_a_des_user() const {
     return nb_observateurs.load(std::memory_order_relaxed) > 0;
+}
+
+void Chunk::print_chunk_coord()const{
+    print_secondaire("coord Chunk:",coord_x,"x",coord_y);
 }

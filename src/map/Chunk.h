@@ -27,6 +27,8 @@ public:
     void add_user();
     void supp_user();
     bool il_y_a_des_user()const;
+
+    void print_chunk_coord()const;
 };
 
 inline void to_json(json& j, const Chunk& c) {

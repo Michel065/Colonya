@@ -498,11 +498,9 @@ std::pair<float, float> visu_to_monde(float centre_x, float centre_y, float visu
     return {world_x, world_y};
 }
 
+void test_display_diag_grille(){
+    print_status(true, "test_display_diag_grille");
 
-int main_test(){
-    print_primaire("!!! MODE TEST !!!");
-    //test_display();
-    
     float x_centre=0,y_centre=0;
     int nbr_case_de_large=2;
     int nbr_case_de_haut=2;
@@ -523,6 +521,53 @@ int main_test(){
             print("B: ", dx2, "x", dy2, " => ", wx2, "x", wy2);
         }
     }
+    print_status(false, "test_display_diag_grille");
+}
+
+
+int main_test(){
+    print_primaire("!!! MODE TEST !!!");
+    test_display();
+    /*
+    // Création et démarrage de la simulation avec la carte "001"
+    Simulation simu("001");
+    if (!simu.start()) {
+        print_error("Erreur lors du démarrage de la simulation !");
+        return 1;
+    }
+
+    MapManager* manager = simu.get_map_manager();
+    if (!manager) {
+        print_error("MapManager introuvable !");
+        return 1;
+    }
+
+    // On demande explicitement le chunk (0, -1)
+    manager->demander_load_chunk(0, -1);
+
+    // Petite pause pour laisser le temps à un thread éventuel de charger
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+
+    // On demande explicitement le chunk (0, -1)
+    manager->demander_load_chunk(0, -1);
+
+    // Petite pause pour laisser le temps à un thread éventuel de charger
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+
+    Map* map = simu.get_carte();
+    if (!map) {
+        print_error("Map introuvable !");
+        return 1;
+    }
+
+    // Récupération directe du chunk
+    Chunk* chunk = map->get_chunk(0, -1);
+    if (chunk != nullptr) {
+        print("ce que je veux");
+        chunk->print_chunk_coord();
+    } else {
+        print_error("Chunk (0,-1) est NULL !");
+    }*/
 
     print_primaire("!!! FIN MODE TEST !!!");
     return 0;

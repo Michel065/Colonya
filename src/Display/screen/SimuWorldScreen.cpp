@@ -6,14 +6,9 @@
 SimuWorldScreen::SimuWorldScreen(const sf::Font& font)
     : Screen(font, Screen_enum::Simu)
 {
-    vue.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    vue.setCenter(WINDOW_WIDTH / 2.f, WINDOW_HEIGHT / 2.f);
-    camera_position = vue.getCenter();
-
     stop_button = new Button("Stop", font, {WINDOW_WIDTH - 100.f, 30.f}, {100.f, 40.f});
     tools.push_back(stop_button);
 }
-
 SimuWorldScreen::~SimuWorldScreen() {
     for (Tool* t : tools) delete t;
     if (simulation) delete simulation;
@@ -49,6 +44,11 @@ void SimuWorldScreen::actualiser_chunks_utilises() {
             a_deload.push_back(coords);
         }
     }
+    
+    // ⚠️ Étape 1.5 : suppression réelle des chunks inutiles
+    for (const auto& coords : a_deload) {
+        chunks_utilises.erase(coords);
+    }
 
     // Étape 2 : détecter les chunks à charger
     for (const auto& coords : nouveaux_chunks) {
@@ -69,6 +69,7 @@ void SimuWorldScreen::actualiser_chunks_utilises() {
             const int max_attempts = 20;
 
             while (!ch && attempts < max_attempts) {
+
                 ch = carte->get_chunk(coords.first, coords.second);
                 if (!ch) sf::sleep(sf::milliseconds(3));
                 attempts++;
@@ -81,6 +82,17 @@ void SimuWorldScreen::actualiser_chunks_utilises() {
             }
         }
     }
+    
+    print_chunk_charge();
+}
+
+void SimuWorldScreen::print_chunk_charge(){
+    std::string msg = "chunk chargé: {";
+    for (const auto& coords : chunks_utilises) {
+        msg += "(" + std::to_string(coords.first.first) + "x" + std::to_string(coords.first.second) + "),";
+    }
+    msg += "}";
+    print_primaire(msg);
 }
 
 std::pair<int, int> SimuWorldScreen::visu_to_monde(int dx, int dy) {
@@ -93,10 +105,8 @@ std::vector<std::pair<int, int>> SimuWorldScreen::calcul_chunks_visibles() {
     std::vector<std::pair<int, int>> visibles;
 
     // Calcul des coins en cases
-    int x_min = centre_case_x - largeur_visible_case_demi;
-    int x_max = centre_case_x + largeur_visible_case_demi;
-    int y_min = centre_case_y - hauteur_visible_case_demi;
-    int y_max = centre_case_y + hauteur_visible_case_demi;
+    auto [x_min, y_min] = visu_to_monde(-largeur_visible_case_demi,-hauteur_visible_case_demi);
+    auto [x_max, y_max] = visu_to_monde(largeur_visible_case_demi,hauteur_visible_case_demi);
 
     // Calcul des coins en chunks
     auto [chunk_x_min, chunk_y_min] = carte->get_chunk_coords(x_min, y_min);
@@ -113,13 +123,9 @@ std::vector<std::pair<int, int>> SimuWorldScreen::calcul_chunks_visibles() {
 }
 
 void SimuWorldScreen::draw(sf::RenderWindow& window) const {
-    sf::View old_view = window.getView();
-    window.setView(vue);
-
+    
     // TODO : dessiner la carte ici
-
-    window.setView(old_view);
-
+    
     for (auto* tool : tools) tool->draw(window);
 }
 
@@ -128,6 +134,7 @@ int SimuWorldScreen::handle_click(sf::Vector2f mouse_pos, DisplayManager* manage
         if (t->is_hovered(mouse_pos)) {
             t->handle_click(mouse_pos);
             if (t == stop_button && manager) {
+                simulation->stop();
                 manager->set_screen(Screen_enum::Menu);
             }
         }
@@ -135,23 +142,36 @@ int SimuWorldScreen::handle_click(sf::Vector2f mouse_pos, DisplayManager* manage
     return -1;
 }
 
-void SimuWorldScreen::handle_camera_movement(float delta) {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) camera_position.x -= delta;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) camera_position.x += delta;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) camera_position.y -= delta;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) camera_position.y += delta;
-    vue.setCenter(camera_position);
+void SimuWorldScreen::handle_camera_movement() {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))  centre_case_x--;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) centre_case_x++;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))    centre_case_y--;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))  centre_case_y++;
+
+    print_test("coords:",centre_case_x,"x",centre_case_y);
+    actualiser_chunks_utilises();
+    carte->print_chunks_load();
 }
 
+
 void SimuWorldScreen::handle_zoom(float delta) {
-    zoom_level += delta;
-    zoom_level = std::clamp(zoom_level, 0.5f, 2.0f);
-    vue.setSize(WINDOW_WIDTH * zoom_level, WINDOW_HEIGHT * zoom_level);
+    if (delta < 0) { // Zoom avant = voir plus large
+        print_secondaire("on zoom en arriere");
+        largeur_visible_case_demi++;
+        hauteur_visible_case_demi++;
+    } else if (delta > 0 && largeur_visible_case_demi > 2 && hauteur_visible_case_demi > 2) {
+        print_secondaire("on zoom en avant");
+        largeur_visible_case_demi--;
+        hauteur_visible_case_demi--;
+    }
+
+    actualiser_chunks_utilises();
 }
+
 
 void SimuWorldScreen::handle_event(const sf::Event& event) {
     if (event.type == sf::Event::KeyPressed) {
-        handle_camera_movement(30.f);
+        handle_camera_movement();
         if (event.key.code == sf::Keyboard::Add || event.key.code == sf::Keyboard::Equal)
             handle_zoom(-0.1f);
         if (event.key.code == sf::Keyboard::Subtract || event.key.code == sf::Keyboard::Dash)

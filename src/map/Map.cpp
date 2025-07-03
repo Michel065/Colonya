@@ -18,13 +18,19 @@ Chunk* Map::get_chunk(int chunk_x, int chunk_y) {
     {
         std::shared_lock lock(mutex); 
         auto it = loaded_chunks.find({chunk_x, chunk_y});
-        if (it != loaded_chunks.end()){
+        if (it != loaded_chunks.end()) {
             return it->second;
         }
     }
+
     std::unique_lock write_lock(mutex);
-    return loaded_chunks[{chunk_x, chunk_y}];
+    auto it = loaded_chunks.find({chunk_x, chunk_y});
+    if (it != loaded_chunks.end()) {
+        return it->second;
+    }
+    return nullptr;
 }
+
 
 Case* Map::get_case(int world_x, int world_y) {
     auto [chunk_x, chunk_y] = get_chunk_coords(world_x, world_y);
@@ -95,8 +101,11 @@ void Map::save_all_chunks() {
 bool Map::chunk_deja_load(int chunk_x, int chunk_y){
     {
         std::unique_lock lock(mutex);
-        if (loaded_chunks.find({chunk_x, chunk_y}) != loaded_chunks.end()) {
+        auto it = loaded_chunks.find({chunk_x, chunk_y});
+
+        if (it != loaded_chunks.end()) {
             print_secondaire_attention("chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " déjà chargé");
+            it->second->print_chunk_coord();
             return true;
         }
     }
@@ -104,9 +113,10 @@ bool Map::chunk_deja_load(int chunk_x, int chunk_y){
 }
 
 void Map::load_chunk(int chunk_x, int chunk_y) {// on av ajouter les gent quand il veul le load 
-    print_secondaire("load chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " ...");
-
+    print_secondaire("load chunk dans la carte " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " ...");
+    print_chunks_load();
     if(chunk_deja_load(chunk_x, chunk_y)){
+        print("salut c un test");
         add_user_to_chunk(chunk_x, chunk_y);
         return;
     }
@@ -208,10 +218,13 @@ void Map::inverse_jour(){
 void Map::add_user_to_chunk(int chunk_x, int chunk_y) {
     std::shared_lock lock(mutex); 
     auto it = loaded_chunks.find({chunk_x, chunk_y});
-    if (it != loaded_chunks.end()) {
+    if (it != loaded_chunks.end() && it->second) {
         it->second->add_user();
+    } else {
+        print_error("chunk présent dans loaded_chunks mais null : ", chunk_x, ", ", chunk_y);
     }
 }
+
 
 void Map::supp_user_to_chunk(int chunk_x, int chunk_y) {
     std::shared_lock lock(mutex); 
