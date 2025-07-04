@@ -15,6 +15,7 @@ public:
     bool has_focus() const override;
 
     std::string get_value() const;
+    bool is_valid();
     void set_valid(bool ok);
 
 private:

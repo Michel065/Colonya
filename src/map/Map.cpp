@@ -115,11 +115,7 @@ bool Map::chunk_deja_load(int chunk_x, int chunk_y){
 void Map::load_chunk(int chunk_x, int chunk_y) {// on av ajouter les gent quand il veul le load 
     print_secondaire("load chunk dans la carte " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + " ...");
     print_chunks_load();
-    if(chunk_deja_load(chunk_x, chunk_y)){
-        print("salut c un test");
-        add_user_to_chunk(chunk_x, chunk_y);
-        return;
-    }
+    if(chunk_deja_load(chunk_x, chunk_y))return;
 
     std::string path = world_file + "/" + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + ".json";
 
@@ -140,7 +136,6 @@ void Map::load_chunk(int chunk_x, int chunk_y) {// on av ajouter les gent quand 
     from_json(chunk_json, *chunk);
     {
         std::unique_lock lock(mutex);
-        chunk->add_user();
         loaded_chunks[{chunk_x, chunk_y}] = chunk;
     }
     print_secondaire("chunk " + std::to_string(chunk_x) + "x" + std::to_string(chunk_y) + ", Done");

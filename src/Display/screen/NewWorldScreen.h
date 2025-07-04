@@ -3,6 +3,10 @@
 
 #include "../../Commun/includes.h"
 #include "../tool/Tool.h"
+#include "../tool/TextLabel.h"
+#include "../tool/InputText.h"
+#include "../tool/InputInt.h"
+#include "../tool/InputFloat.h"
 #include "Screen.h"
 #include "../../Map/NoiseGenerator.h"
 #include "../../Simu/Simu.h"
@@ -18,6 +22,14 @@ public:
 
 private:
     std::vector<Tool*> tools;
+    InputText* nom = nullptr;
+    InputInt* seed = nullptr;
+    InputInt* octaves = nullptr;
+    InputFloat* pers = nullptr;
+    InputFloat* scale_alt = nullptr;
+    InputFloat* scale_hum = nullptr;
+    InputInt* decal = nullptr;
+    TextLabel* label_erreur=nullptr;
 };
 
 #endif

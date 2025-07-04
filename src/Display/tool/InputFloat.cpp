@@ -1,7 +1,7 @@
 #include "InputFloat.h"
 #include <iostream>
 
-InputFloat::InputFloat(const std::string& label_text, const sf::Font& font, sf::Vector2f center, sf::Vector2f size, int default_value)
+InputFloat::InputFloat(const std::string& label_text, const sf::Font& font, sf::Vector2f center, sf::Vector2f size, float default_value)
 {
     box.setSize(size);
     box.setOrigin(size.x / 2.f, size.y / 2.f);
@@ -66,6 +66,24 @@ float InputFloat::get_value() const {
 void InputFloat::set_valid(bool valid) {
     box.setFillColor(valid ? sf::Color(220, 220, 220) : sf::Color(255, 150, 150));
 }
+
 std::string InputFloat::get_value_str() const {
     return value_str;
+}
+
+bool InputFloat::is_valid() {
+    if (value_str.empty() || value_str == ".") {
+        set_valid(false);
+        return false;
+    }
+
+    try {
+        std::stof(value_str);
+    } catch (...) {
+        set_valid(false);
+        return false;
+    }
+
+    set_valid(true);
+    return true;
 }

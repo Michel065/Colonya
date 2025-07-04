@@ -75,23 +75,46 @@ Map* MapManager::get_map(){
     return &carte;
 }
 
-void MapManager::demander_load_chunk(int x, int y) {
+Chunk* MapManager::demander_load_chunk(int x, int y, bool entre_dans_le_chunk) {
     {
         std::lock_guard<std::mutex> lock(mtx_chunks);
         chunks_a_load_share.emplace_back(x, y);
     }
-    time_manager->signal_event(); // réveille le thread si besoin
+    time_manager->signal_event();
+
+    if (!entre_dans_le_chunk)return nullptr;
+
+    Chunk* chunk = nullptr;
+    int attempts = 0;
+    while (!chunk && attempts < max_attempts) {
+        chunk = carte.get_chunk(x, y);
+        if (!chunk) sf::sleep(sf::milliseconds(time_between_attempts));
+        attempts++;
+    }
+    if (chunk) {
+        carte.add_user_to_chunk(x, y); // on y entre
+    } else {
+        print_error("Chunk introuvable après ", attempts, " tentatives : (", x, ",", y, ")");
+    }
+
+    return chunk;
 }
 
-void MapManager::demander_deload_chunk(int x, int y) {
+
+void MapManager::demander_deload_chunk(int x, int y, bool sort_du_chunk) {
     {
         std::lock_guard<std::mutex> lock(mtx_chunks);
         chunks_a_deload_share.emplace_back(x, y);
     }
-    time_manager->signal_event(); // réveille le thread si besoin
+    time_manager->signal_event();
+
+    if (!sort_du_chunk) return;
+
+    carte.supp_user_to_chunk(x, y);
 }
 
-void MapManager::demander_load_chunk(const std::vector<std::pair<int, int>>& chunks) {
+
+std::vector<Chunk*> MapManager::demander_load_chunk(const std::vector<std::pair<int, int>>& chunks, bool entre_dans_le_chunk) {
     {
         std::lock_guard<std::mutex> lock(mtx_chunks);
         for (const auto& c : chunks) {
@@ -99,9 +122,32 @@ void MapManager::demander_load_chunk(const std::vector<std::pair<int, int>>& chu
         }
     }
     time_manager->signal_event();
+
+    std::vector<Chunk*> result;
+    if (!entre_dans_le_chunk) return result;
+
+    for (const auto& [x, y] : chunks) {
+        Chunk* chunk = nullptr;
+        int attempts = 0;
+        while (!chunk && attempts < max_attempts) {
+            chunk = carte.get_chunk(x, y);
+            if (!chunk) sf::sleep(sf::milliseconds(time_between_attempts));
+            attempts++;
+        }
+        if (chunk) {
+            carte.add_user_to_chunk(x, y);
+        } else {
+            print_error("Chunk introuvable après demande multiple : (", x, ",", y, ")");
+        }
+
+        result.push_back(chunk);
+    }
+
+    return result;
 }
 
-void MapManager::demander_deload_chunk(const std::vector<std::pair<int, int>>& chunks) {
+
+void MapManager::demander_deload_chunk(const std::vector<std::pair<int, int>>& chunks, bool sort_du_chunk) {
     {
         std::lock_guard<std::mutex> lock(mtx_chunks);
         for (const auto& c : chunks) {
@@ -109,7 +155,14 @@ void MapManager::demander_deload_chunk(const std::vector<std::pair<int, int>>& c
         }
     }
     time_manager->signal_event();
+
+    if (!sort_du_chunk) return;
+
+    for (const auto& [x, y] : chunks) {
+        carte.supp_user_to_chunk(x, y);
+    }
 }
+
 
 
 bool MapManager::chunk_existe(int x, int y){
@@ -131,8 +184,8 @@ void MapManager::load_chunk(int x, int y){
         print_secondaire_attention("chunk non existant,creation de ",x,"x",y," en json");
         create_chunk(x,y);
     }
-    verif_et_creer_autour_chunk(x,y);
     carte.load_chunk(x,y);
+    verif_et_creer_autour_chunk(x,y);
 }
 
 void MapManager::load_all_chunk_from_liste(std::vector<std::pair<int, int>> chunks){

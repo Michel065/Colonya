@@ -17,7 +17,7 @@ private:
     sf::Font font;
 
     std::vector<Screen*> screens;
-    Screen_enum current_screen = Screen_enum::LoadMap;
+    Screen_enum current_screen = Screen_enum::Menu;
 
     SimuWorldScreen* screen_de_la_simu=nullptr;
 
@@ -35,6 +35,9 @@ public:
     void set_screen(Screen_enum new_screen);
 
     void set_simu_in_simu_screen(Simulation*simu);
+    
+    //c pas opti mais c jolie a voir si je change
+    void draw_loading_screen();
 };
 
 #endif

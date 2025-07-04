@@ -62,6 +62,7 @@ int LoadWorldScreen::handle_click(sf::Vector2f mouse_pos, DisplayManager* manage
                         return -1;
                     }
                     print_primaire("Chargement du monde sélectionné (", monde_selectionne, ")");
+                    manager->draw_loading_screen();
                     Simulation* simu=new Simulation(monde_selectionne);
                     if (manager) manager->set_simu_in_simu_screen(simu);
                     if (manager) manager->set_screen(Screen_enum::Simu);

@@ -16,6 +16,7 @@ public:
 
     int get_value() const;
 
+    bool is_valid();
     void set_valid(bool valid);
     std::string get_value_str() const;
 

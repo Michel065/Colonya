@@ -9,7 +9,10 @@ constexpr unsigned int WINDOW_HEIGHT = 720;
 constexpr const char* WINDOW_TITLE   = "Colonya";
 
 // Grille / logique
-constexpr float TILE_SIZE = 32.f;
+constexpr float SIZE_ORIGINE_X_TEXTURE = 64.f;
+constexpr float SIZE_ORIGINE_Y_TEXTURE = 40.f;
+constexpr float SIZE_ORIGINE_Y_TEXTURE_SANS_3D = 32.f;
+
 
 // Interface graphique
 constexpr float BUTTON_WIDTH  = 200.f;
@@ -25,5 +28,6 @@ constexpr float UI_SECTION_MARGIN_TOP = 150.f;  // distance du haut pour le déb
 
 constexpr float DEFAULT_FONT_SIZE_LABEL = 20.f;
 constexpr float DEFAULT_FONT_SIZE_TITLE = 40.f;
+
 
 #endif

@@ -82,3 +82,13 @@ void DisplayManager::set_simu_in_simu_screen(Simulation*simu){
     screen_de_la_simu->set_simulation(simu,this);
 }
 
+void DisplayManager::draw_loading_screen() {
+    window.clear(sf::Color(30, 30, 30));
+    sf::Vector2f centre(WINDOW_WIDTH / 2.f, WINDOW_HEIGHT / 2.f);
+    TextLabel* loading_label = new TextLabel("Chargement...", font, centre, 50, sf::Color::White);
+
+    loading_label->draw(window);
+    delete loading_label;
+
+    window.display();
+}
