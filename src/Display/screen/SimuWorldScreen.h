@@ -8,6 +8,8 @@
 
 #include "../../Simu/Simu.h"
 #include "../../Map/Map.h"
+#include "../tool/CalculateurDeRecouvrement.h"
+
 
 class SimuWorldScreen : public Screen {
 private:
@@ -19,8 +21,8 @@ private:
     Map* carte = nullptr;
 
     // Position logique de la caméra (en cases)
-    int centre_case_x = 6;
-    int centre_case_y = 5;
+    int centre_case_x = 25;
+    int centre_case_y = 25;
 
     // Taille de la vue visible (moitié du nombre de cases dans chaque direction)
     int largeur_visible_case_demi = 6;
@@ -28,6 +30,7 @@ private:
 
     // Chunks actuellement utilisés (affichés)
     std::unordered_map<std::pair<int, int>, Chunk*, pair_hash> chunks_utilises;
+    CalculateurDeRecouvrement calc;
 
     // Fonctions internes
     void handle_camera_movement();
@@ -50,6 +53,8 @@ private:
     void update_case_size();
     void update();
     sf::Vector2f conv_coord_visuel_en_coord_pixel(float case_x, float case_y) const;
+    //sf::Vector2f conv_coord_pixel_en_coord_visuel(sf::Vector2f pos_pixel) const;
+
 
     //draw local
     void draw_fond(sf::RenderWindow& window) const;

@@ -14,6 +14,15 @@ std::pair<int, int> Map::get_local_coords(int world_x, int world_y) const {
     return {lx, ly};
 }
 
+
+std::pair<float, float> Map::get_local_coords_float(int world_x, int world_y) const{
+    std::pair<int, int> coord = get_local_coords(world_x,world_y);
+    float fx=0,fy=0;
+    fx=static_cast<float>(coord.first)/CHUNK_SIZE;
+    fy=static_cast<float>(coord.second)/CHUNK_SIZE;
+    return {fx, fy};
+}
+
 Chunk* Map::get_chunk(int chunk_x, int chunk_y) {
     {
         std::shared_lock lock(mutex); 

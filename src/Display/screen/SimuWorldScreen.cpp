@@ -90,27 +90,29 @@ std::pair<int, int> SimuWorldScreen::visu_to_monde(float dx, float dy) const{
 
 std::vector<std::pair<int, int>> SimuWorldScreen::calcul_chunks_visibles() {
     std::vector<std::pair<int, int>> visibles;
+    int marge = 2;
 
-    // Coins diagonaux du losange visible (coord visu)
-    auto [x1, y1] = visu_to_monde(-largeur_visible_case_demi, 0); // gauche
-    auto [x2, y2] = visu_to_monde(0, -hauteur_visible_case_demi); // haut
-    auto [x3, y3] = visu_to_monde(largeur_visible_case_demi, 0);  // droite
-    auto [x4, y4] = visu_to_monde(0, hauteur_visible_case_demi);  // bas
+    // Points en visu -> monde
+    std::vector<std::pair<float, float>> coins_monde = {
+        visu_to_monde(-largeur_visible_case_demi - marge,  hauteur_visible_case_demi + marge), // haut gauche
+        visu_to_monde(-largeur_visible_case_demi - marge, -hauteur_visible_case_demi - marge), // bas gauche
+        visu_to_monde( largeur_visible_case_demi + marge, -hauteur_visible_case_demi - marge), // bas droite
+        visu_to_monde( largeur_visible_case_demi + marge,  hauteur_visible_case_demi + marge)  // haut droite
+    };
 
-    int min_x = std::min({x1, x2, x3, x4});
-    int max_x = std::max({x1, x2, x3, x4});
-    int min_y = std::min({y1, y2, y3, y4});
-    int max_y = std::max({y1, y2, y3, y4});
+    std::vector<Point> points;
 
-    auto [chunk_x_min, chunk_y_min] = carte->get_chunk_coords(min_x, min_y);
-    auto [chunk_x_max, chunk_y_max] = carte->get_chunk_coords(max_x, max_y);
-
-    for (int cx = chunk_x_min; cx <= chunk_x_max; ++cx) {
-        for (int cy = chunk_y_min; cy <= chunk_y_max; ++cy) {
-            visibles.emplace_back(cx, cy);
-        }
+    for (const auto& [wx, wy] : coins_monde) {
+        auto [chunk_x, chunk_y] = carte->get_chunk_coords(wx, wy);
+        auto [offset_x, offset_y] = carte->get_local_coords_float(wx, wy);
+        points.push_back(Point{
+            static_cast<float>(chunk_x) + offset_x,
+            static_cast<float>(chunk_y) + offset_y
+        });
     }
 
+    visibles = calc.get_chunk(points);
+    
     return visibles;
 }
 
@@ -145,6 +147,20 @@ int SimuWorldScreen::handle_click(sf::Vector2f mouse_pos, DisplayManager* manage
             }
         }
     }
+
+    /*if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        sf::Vector2f mouse_coord_ecran = conv_coord_pixel_en_coord_visuel(mouse_pos);
+
+        auto [case_x, case_y] = visu_to_monde(mouse_coord_ecran.x, mouse_coord_ecran.y);
+        auto [chunk_x, chunk_y] = carte->get_chunk_coords(case_x, case_y);
+
+        print_primaire("Click gauche détecté sur la case :", case_x, "x", case_y," centre:",centre_case_x,"x",centre_case_y);
+        print_primaire("texture dnas la case:", case_x, "x", case_y," text:",get_texture_from_carte(mouse_coord_ecran.x, mouse_coord_ecran.y));
+        print_primaire("=> Appartient au chunk :", chunk_x, "x", chunk_y);
+    }*/
+
+
+
     return -1;
 }
 
@@ -229,7 +245,14 @@ void SimuWorldScreen::update(){
     actualiser_chunks_utilises();
     update_sprites_scale();
     update_case_size();
+    print_chunk_charge();
 }
+
+/*sf::Vector2f SimuWorldScreen::conv_coord_pixel_en_coord_visuel(sf::Vector2f pos_pixel) const {
+    float coord_x =     (pos_pixel.x - WINDOW_WIDTH / 2.0f + pixels_par_case_x/2)/ pixels_par_case_x;
+    float coord_y =     (pos_pixel.y - WINDOW_HEIGHT / 2.0f + pixels_par_case_y/2)/ pixels_par_case_y;
+    return sf::Vector2f(coord_x, coord_y);
+}*/
 
 sf::Vector2f SimuWorldScreen::conv_coord_visuel_en_coord_pixel(float case_x, float case_y) const {
     /*// on bouge le fond

@@ -488,62 +488,11 @@ void test_simulation() {
 }
 
 
-std::pair<float, float> visu_to_monde(float centre_x, float centre_y, float visu_x, float visu_y) {
-    float dx = visu_x;
-    float dy = visu_y;
-
-    float world_x = centre_x + dx + dy;
-    float world_y = centre_y + dy - dx;
-
-    return {world_x, world_y};
-}
-
-void test_display_diag_grille(){
-    print_status(true, "test_display_diag_grille");
-
-    float x_centre=0,y_centre=0;
-    int nbr_case_de_large=2;
-    int nbr_case_de_haut=2;
-
-    for (int ix = -nbr_case_de_large; ix <= nbr_case_de_large; ++ix) {
-        for (int iy = -nbr_case_de_haut; iy <= nbr_case_de_haut; ++iy) {
-            float dx1 = static_cast<float>(ix);
-            float dy1 = static_cast<float>(iy);
-
-            // Case "pleine"
-            auto [wx1, wy1] = visu_to_monde(x_centre, y_centre, dx1, dy1);
-            print("A: ", dx1, "x", dy1, " => ", wx1, "x", wy1);
-
-            // Case "décalée" pour boucher les trous
-            float dx2 = dx1 + 0.5f;
-            float dy2 = dy1 + 0.5f;
-            auto [wx2, wy2] = visu_to_monde(x_centre, y_centre, dx2, dy2);
-            print("B: ", dx2, "x", dy2, " => ", wx2, "x", wy2);
-        }
-    }
-    print_status(false, "test_display_diag_grille");
-}
-
+#include "../Display/tool/CalculateurDeRecouvrement.h"
 
 int main_test(){
     print_primaire("!!! MODE TEST !!!");
-    //test_display();
-
-    int angle_gauche_haut_x=0,angle_gauche_haut_y=-5;
-    int angle_gauche_bas_x=-5,angle_gauche_bas_y=0;
-    int angle_droit_haut_x=0,angle_droit_haut_y=5;
-    int angle_droit_bas_x=5,angle_droit_bas_y=0;
-
-    int nbr_ite= (std::abs(angle_gauche_haut_x-angle_gauche_bas_x)+std::abs(angle_gauche_haut_y-angle_gauche_bas_y))/2;
-    int direction_x=(angle_gauche_bas_x-angle_gauche_haut_x)/std::abs(angle_gauche_bas_x-angle_gauche_haut_x);
-    int direction_y=(angle_gauche_bas_y-angle_gauche_haut_y)/std::abs(angle_gauche_bas_y-angle_gauche_haut_y);
-
-
-    for (int ite = 0; ite <= nbr_ite; ++ite) {
-        print("valeur a recup:",angle_gauche_bas_x+ite*direction_x,"x",,angle_gauche_bas_y+ite*direction_y);
-    }
-
-
+    test_display();
     print_primaire("!!! FIN MODE TEST !!!");
     return 0;
 }
