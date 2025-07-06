@@ -13,6 +13,7 @@
 class LoadWorldScreen : public Screen {
 private:
     void charger_mondes();
+    void delete_mondes(std::string name);
     
     std::vector<Tool*> tools;
     ScrollableButtonList liste_boutons;

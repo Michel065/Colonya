@@ -12,10 +12,7 @@ LoadWorldScreen::LoadWorldScreen(const sf::Font& font)
     tools.push_back(new TextLabel("Charger un monde existant", font, {x, y - 80}, DEFAULT_FONT_SIZE_TITLE));
     tools.push_back(new Button("Retour", font, {x - 150, WINDOW_HEIGHT - 80}, {BUTTON_WIDTH, BUTTON_HEIGHT}));
     tools.push_back(new Button("Load", font, {x + 150, WINDOW_HEIGHT - 80}, {BUTTON_WIDTH, BUTTON_HEIGHT}));
-
-    // Navigation gauche/droite
-    tools.push_back(new Button("<", font, {100, WINDOW_HEIGHT / 2.f}, {40, 40}));
-    tools.push_back(new Button(">", font, {WINDOW_WIDTH - 100, WINDOW_HEIGHT / 2.f}, {40, 40}));
+    tools.push_back(new Button("Supprimer", font, {WINDOW_WIDTH - BUTTON_WIDTH, 80}, {BUTTON_WIDTH, BUTTON_HEIGHT},sf::Color(200, 50, 50)));
 
     // Charger les mondes et peupler la liste
     charger_mondes();
@@ -29,6 +26,23 @@ void LoadWorldScreen::charger_mondes() {
             liste_boutons.add_label(entry.path().filename().string());
         }
     }
+}
+
+void LoadWorldScreen::delete_mondes(std::string name) {
+    std::string path = worlds_file + name;
+    if (!fs::exists(path)) {
+        print_error("Le dossier '", path, "' n'existe pas.");
+        monde_selectionne="";
+        return;
+    }
+
+    try {
+        fs::remove_all(path);
+        print_primaire("Monde supprimé :", name);
+    } catch (const std::exception& e) {
+        print_error("Erreur lors de la suppression de ", name, " : ", e.what());
+    }
+    liste_boutons.delete_boutons(name);
 }
 
 void LoadWorldScreen::draw(sf::RenderWindow& window) const {
@@ -54,6 +68,15 @@ int LoadWorldScreen::handle_click(sf::Vector2f mouse_pos, DisplayManager* manage
 
                 if (label == "Retour") {
                     if (manager) manager->set_screen(Screen_enum::Menu);
+                    return -1;
+                }
+                if (label == "Supprimer") {
+                    if (monde_selectionne.empty()) {
+                        print_error("Aucun monde sélectionné.");
+                        return -1;
+                    }
+                    print_primaire("Suppression du monde sélectionné (", monde_selectionne, ")");
+                    delete_mondes(monde_selectionne);
                     return -1;
                 }
                 if (label == "Load") {

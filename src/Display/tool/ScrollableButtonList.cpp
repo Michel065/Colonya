@@ -12,6 +12,15 @@ void ScrollableButtonList::add_label(const std::string& label) {
     update_display();
 }
 
+void ScrollableButtonList::delete_boutons(const std::string& label) {
+    // Supprimer dans labels
+    auto it_label = std::find(labels.begin(), labels.end(), label);
+    if (it_label != labels.end()) {
+        labels.erase(it_label);
+    }
+    update_display();
+}
+
 void ScrollableButtonList::update_display() {
     
     clear();

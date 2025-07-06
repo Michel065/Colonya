@@ -63,8 +63,6 @@ void Map::deload_chunk(int chunk_x, int chunk_y) {
     if (it != loaded_chunks.end()) {
         Chunk* chunk = it->second;
 
-        chunk->supp_user();
-
         if (!chunk->il_y_a_des_user()) {
             loaded_chunks.erase(it);
             delete_chunk(chunk);
@@ -186,6 +184,20 @@ void Map::load_chunk_from_liste(std::vector<std::pair<int, int>> chunks){
 
 void Map::deload_chunk_from_liste(std::vector<std::pair<int, int>> chunks){
     for (const auto& [coord_x, coord_y] : chunks) {
+        deload_chunk(coord_x, coord_y);
+    }
+}
+
+void Map::decharge_chunk_pas_utilise() {
+    std::vector<std::pair<int, int>> a_supp;
+
+    for (const auto& [coords, chunk] : loaded_chunks) {
+        if (chunk && !chunk->il_y_a_des_user()) {
+            a_supp.push_back(coords);
+        }
+    }
+
+    for (const auto& [coord_x, coord_y] : a_supp) {
         deload_chunk(coord_x, coord_y);
     }
 }

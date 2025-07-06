@@ -39,6 +39,7 @@ public:
     std::vector<std::pair<int, int>>  get_all_chunk_keys();
     void load_chunk_from_liste(std::vector<std::pair<int, int>> chunks);
     void deload_chunk_from_liste(std::vector<std::pair<int, int>> chunks);
+    void decharge_chunk_pas_utilise();
     void set_chunk_spawn(std::pair<int, int> chunk_spaw);
     std::pair<int, int> get_chunk_spawn();
 

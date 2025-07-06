@@ -102,15 +102,12 @@ Chunk* MapManager::demander_load_chunk(int x, int y, bool entre_dans_le_chunk) {
 
 
 void MapManager::demander_deload_chunk(int x, int y, bool sort_du_chunk) {
+    if (sort_du_chunk) carte.supp_user_to_chunk(x, y);
     {
         std::lock_guard<std::mutex> lock(mtx_chunks);
         chunks_a_deload_share.emplace_back(x, y);
     }
     time_manager->signal_event();
-
-    if (!sort_du_chunk) return;
-
-    carte.supp_user_to_chunk(x, y);
 }
 
 
@@ -148,19 +145,18 @@ std::vector<Chunk*> MapManager::demander_load_chunk(const std::vector<std::pair<
 
 
 void MapManager::demander_deload_chunk(const std::vector<std::pair<int, int>>& chunks, bool sort_du_chunk) {
+    if (sort_du_chunk){
+        for (const auto& [x, y] : chunks) {
+            carte.supp_user_to_chunk(x, y);
+        }
+    }
     {
         std::lock_guard<std::mutex> lock(mtx_chunks);
         for (const auto& c : chunks) {
             chunks_a_deload_share.emplace_back(c);
         }
     }
-    time_manager->signal_event();
-
-    if (!sort_du_chunk) return;
-
-    for (const auto& [x, y] : chunks) {
-        carte.supp_user_to_chunk(x, y);
-    }
+    time_manager->signal_event();    
 }
 
 
@@ -207,6 +203,10 @@ void MapManager::verif_et_creer_autour_chunk(int xx, int yy){
     }
 }
 
+void MapManager::decharge_chunk_pas_utilise(){
+    carte.decharge_chunk_pas_utilise();
+}
+
 void MapManager::start() {
     print_primaire("Demarage Map Manager!");
     while (time_manager->status()) {
@@ -222,7 +222,8 @@ void MapManager::start() {
         if(!chunks_a_deload_local.empty())deload_all_chunk_from_liste(chunks_a_deload_local);
 
         if (time_manager->get_date() % cycle_jour_nuit == 0) {
-            // cycle jour/nuit
+            decharge_chunk_pas_utilise();
+            //inverse_jour();
         }
         time_manager->wait_condition_and_tick(cycle_jour_nuit, [&]() {
             std::lock_guard<std::mutex> lock(mtx_chunks);

@@ -31,6 +31,8 @@ public:
 
     std::vector<Tool*>& get_tools();
     std::string get_selected_label() const;
+    void delete_boutons(const std::string& label);
+
 };
 
 #endif

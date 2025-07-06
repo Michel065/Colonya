@@ -16,7 +16,7 @@ private:
     MapGenerator* generateur;
     TimeManager* time_manager;
 
-    int cycle_jour_nuit = 50;
+    int cycle_jour_nuit = 15;
     
     //pour les demande de load/deload
     const int max_attempts = 100;
@@ -46,6 +46,8 @@ public:
     void load_all_chunk_from_liste(std::vector<std::pair<int, int>> chunks);
     void deload_all_chunk_from_liste(std::vector<std::pair<int, int>> chunks);
     void verif_et_creer_autour_chunk(int x, int y);
+    void decharge_chunk_pas_utilise();
+
 
     void set_cycle_jour_nuit(int val);
     

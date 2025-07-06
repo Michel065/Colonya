@@ -173,7 +173,7 @@ void SimuWorldScreen::handle_camera_movement() {
 
 
 void SimuWorldScreen::handle_zoom(float delta) {
-    if (delta < 0) { // Zoom avant = voir plus large
+    if (delta < 0 && largeur_visible_case_demi<10) { // Zoom avant = voir plus large
         print_secondaire("on zoom en arriere");
         largeur_visible_case_demi++;
         hauteur_visible_case_demi++;

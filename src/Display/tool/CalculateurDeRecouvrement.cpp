@@ -1,6 +1,4 @@
 #include "CalculateurDeRecouvrement.h"
-#include <cmath>
-#include <algorithm>
 
 using Cell = std::pair<int, int>;
 
@@ -67,8 +65,9 @@ bool CalculateurDeRecouvrement::polygon_intersects_cell(const std::vector<Point>
 
 std::vector<Cell> CalculateurDeRecouvrement::get_chunk(const std::vector<Point>& input) {
     std::set<Cell> result;
-
-    if (input.empty()) return {};
+    if (input.empty()) {
+        return {};
+    }
 
     if (input.size() == 1) {
         int x = std::floor(input[0].x);
@@ -115,6 +114,5 @@ std::vector<Cell> CalculateurDeRecouvrement::get_chunk(const std::vector<Point>&
             }
         }
     }
-
     return std::vector<Cell>(result.begin(), result.end());
 }

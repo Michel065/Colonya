@@ -1,7 +1,7 @@
-#pragma once
-#include <vector>
-#include <set>
-#include <utility>
+#ifndef _CALCULATEUR_DE_RECOUVREMENT_H
+#define _CALCULATEUR_DE_RECOUVREMENT_H
+
+#include "../../Commun/includes.h"
 
 struct Point {
     float x, y;
@@ -17,3 +17,5 @@ private:
     bool polygon_intersects_cell(const std::vector<Point>& poly, int i, int j);
     Point make_point(int x, int y);
 };
+
+#endif
