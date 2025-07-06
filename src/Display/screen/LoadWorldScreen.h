@@ -5,18 +5,20 @@
 #include "Screen.h"
 #include "../tool/Tool.h"
 #include "../tool/Button.h"
+#include "../tool/TextLabel.h"
+#include "../tool/ScrollableButtonList.h"
+
+#include "../../Simu/Simu.h"
 
 class LoadWorldScreen : public Screen {
 private:
     void charger_mondes();
-    void update_affichage_mondes();
-
-    std::vector<std::string> mondes;
-    std::vector<Tool*> tools;
-    int page_index = 0;
-    std::string monde_selectionne;
-    Button* selected_button = nullptr;
+    void delete_mondes(std::string name);
     
+    std::vector<Tool*> tools;
+    ScrollableButtonList liste_boutons;
+    std::string monde_selectionne="";
+
 public:
     LoadWorldScreen(const sf::Font& font);
     void draw(sf::RenderWindow& window) const override;

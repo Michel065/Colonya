@@ -19,11 +19,14 @@ private:
 
     mutable std::shared_mutex mutex;
 
-    std::pair<int, int> get_chunk_coords(int world_x, int world_y) const;
-    std::pair<int, int> get_local_coords(int world_x, int world_y) const;
     std::pair<int, int> chunk_spawn={0,0};
 
 public:
+
+    std::pair<int, int> get_chunk_coords(int world_x, int world_y) const;
+    std::pair<int, int> get_local_coords(int world_x, int world_y) const;
+    std::pair<float, float> get_local_coords_float(int world_x, int world_y) const;
+    
     Chunk * get_chunk(int chunk_x, int chunk_y);
     Case* get_case(int world_x, int world_y);
     void delete_chunk(Chunk* chu);
@@ -36,6 +39,7 @@ public:
     std::vector<std::pair<int, int>>  get_all_chunk_keys();
     void load_chunk_from_liste(std::vector<std::pair<int, int>> chunks);
     void deload_chunk_from_liste(std::vector<std::pair<int, int>> chunks);
+    void decharge_chunk_pas_utilise();
     void set_chunk_spawn(std::pair<int, int> chunk_spaw);
     std::pair<int, int> get_chunk_spawn();
 
@@ -45,6 +49,9 @@ public:
 
     bool il_fait_jour();
     void inverse_jour();
+    
+    void add_user_to_chunk(int chunk_x, int chunk_y);
+    void supp_user_to_chunk(int chunk_x, int chunk_y);
 };
 
 #endif

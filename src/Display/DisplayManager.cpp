@@ -9,6 +9,8 @@ DisplayManager::DisplayManager()
     screens.push_back(new MenuScreen(font));
     screens.push_back(new NewWorldScreen(font));
     screens.push_back(new LoadWorldScreen(font));
+    screen_de_la_simu=new SimuWorldScreen(font);
+    screens.push_back(screen_de_la_simu);
 }
 
 DisplayManager::~DisplayManager() {
@@ -27,6 +29,14 @@ void DisplayManager::run() {
 void DisplayManager::handle_events() {
     sf::Event event;
     while (window.pollEvent(event)) {
+        // Transmettre tous les événements à l'écran actif
+        for (auto* screen : screens) {
+            if (screen->is_active(current_screen)) {
+                screen->handle_event(event);
+            }
+        }
+
+        // Gestion globale
         if (event.type == sf::Event::Closed)
             window.close();
 
@@ -38,14 +48,6 @@ void DisplayManager::handle_events() {
             for (auto* screen : screens) {
                 if (screen->is_active(current_screen)) {
                     screen->handle_click(mouse_pos, this);
-                }
-            }
-        }
-
-        if (event.type == sf::Event::TextEntered) {
-            for (auto* screen : screens) {
-                if (screen->is_active(current_screen)) {
-                    screen->handle_event(event); // pour gérer l’input texte
                 }
             }
         }
@@ -74,4 +76,19 @@ void DisplayManager::close() {
 
 void DisplayManager::set_screen(Screen_enum new_screen) {
     current_screen = new_screen;
+}
+
+void DisplayManager::set_simu_in_simu_screen(Simulation*simu){
+    screen_de_la_simu->set_simulation(simu,this);
+}
+
+void DisplayManager::draw_loading_screen() {
+    window.clear(sf::Color(30, 30, 30));
+    sf::Vector2f centre(WINDOW_WIDTH / 2.f, WINDOW_HEIGHT / 2.f);
+    TextLabel* loading_label = new TextLabel("Chargement...", font, centre, 50, sf::Color::White);
+
+    loading_label->draw(window);
+    delete loading_label;
+
+    window.display();
 }

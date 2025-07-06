@@ -17,3 +17,7 @@ void TextLabel::draw(sf::RenderWindow& window) const {
 std::string TextLabel::get_label() const {
     return label.getString();
 }
+
+void TextLabel::set_text(std::string text){
+    label.setString(text);
+}

@@ -10,15 +10,17 @@ private:
     bool running;
     int ticksPerSecond;
     unsigned long date=0;
-    unsigned long duree_simulation=100;
+    unsigned long duree_simulation=1000 ;
     std::chrono::milliseconds tickDuration;
     std::chrono::steady_clock::time_point lastTickTime;
-    std::mutex mtx;
-    std::condition_variable tickCV,eventCV ;
+    std::mutex mtx,pause_mutex;
+    std::condition_variable tickCV,eventCV,pause_cv ;
+    bool paused = false;
+
 
 
 public:
-    TimeManager(int tps) : running(true),ticksPerSecond(tps) {
+    TimeManager(int tps=2) : running(true),ticksPerSecond(tps) {
         /*
         Cette class a pour role de creer un temps coherent entre nos thread et donc de les syncronisé on fais ca sous forme de tick
         de cette maniere l'idée est de faire en sorte que la vitesse de notre simulation soit reglable.     
@@ -34,6 +36,9 @@ public:
             std::chrono::milliseconds elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastTickTime);
             if (elapsedTime >= tickDuration) {
                 lastTickTime = now;
+                std::unique_lock<std::mutex> lock(pause_mutex);
+                pause_cv.wait(lock, [&]() { return !paused || !running; });
+                lock.unlock();
                 tick();
             } else {
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));  // Dormir si pas encore de tick
@@ -96,6 +101,22 @@ public:
         std::lock_guard<std::mutex> lock(mtx);
         eventCV.notify_all(); // événement externe
     }
+
+    void pause() {
+        std::lock_guard<std::mutex> lock(pause_mutex);
+        paused = true;
+        print_primaire("Pause Time Manager!");
+    }
+
+    void reprise() {
+        {
+            std::lock_guard<std::mutex> lock(pause_mutex);
+            paused = false;
+        }
+        pause_cv.notify_all();
+        print_primaire("Reprise Time Manager!");
+    }
+
 };
 
 #endif

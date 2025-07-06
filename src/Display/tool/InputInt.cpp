@@ -69,3 +69,20 @@ void InputInt::set_valid(bool valid) {
 std::string InputInt::get_value_str() const {
     return value_str;
 }
+
+bool InputInt::is_valid() {
+    if (value_str.empty()) {
+        set_valid(false);
+        return false;
+    }
+
+    try {
+        std::stoi(value_str);
+    } catch (...) {
+        set_valid(false);
+        return false;
+    }
+
+    set_valid(true);
+    return true;
+}

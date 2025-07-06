@@ -21,6 +21,9 @@
 //display
 #include "../Display/DisplayManager.h"
 
+//simu
+#include "../Simu/Simu.h"
+
 int main_test();
 
 #endif

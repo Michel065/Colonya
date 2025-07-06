@@ -5,7 +5,7 @@
 
 class InputFloat : public Tool {
 public:
-    InputFloat(const std::string& label_text, const sf::Font& font, sf::Vector2f center, sf::Vector2f size, int default_value = 0);
+    InputFloat(const std::string& label_text, const sf::Font& font, sf::Vector2f center, sf::Vector2f size, float default_value = 0);
 
     void draw(sf::RenderWindow& window) const override;
     bool is_hovered(sf::Vector2f mouse_pos) const override;
@@ -14,6 +14,7 @@ public:
     void lose_focus() override;
     bool has_focus() const override;
 
+    bool is_valid();
     float get_value() const;
 
     void set_valid(bool valid);

@@ -2,7 +2,7 @@
 
 MapManager::MapManager(std::string name_map, TimeManager& tm, NoiseParam* param_generator,std::pair<int, int> chunk_spaw) : name_map(name_map),time_manager(&tm) {  
     world_file=worlds_file+name_map;
-    chunk_spawn=chunk_spaw;
+    chunk_spawn=chunk_spaw;// c pas vraiment bon si on change le spawn en chargant une carte eistante ca peux faire des bug donc a revoir mais pas prioritaire
     if (fs::exists(world_file)) {
         print_primaire("Le monde ",world_file," existe.");
     } else {
@@ -75,21 +75,91 @@ Map* MapManager::get_map(){
     return &carte;
 }
 
-void MapManager::demander_load_chunk(int x, int y) {
+Chunk* MapManager::demander_load_chunk(int x, int y, bool entre_dans_le_chunk) {
     {
         std::lock_guard<std::mutex> lock(mtx_chunks);
         chunks_a_load_share.emplace_back(x, y);
     }
-    time_manager->signal_event(); // réveille le thread si besoin
+    time_manager->signal_event();
+
+    if (!entre_dans_le_chunk)return nullptr;
+
+    Chunk* chunk = nullptr;
+    int attempts = 0;
+    while (!chunk && attempts < max_attempts) {
+        chunk = carte.get_chunk(x, y);
+        if (!chunk) sf::sleep(sf::milliseconds(time_between_attempts));
+        attempts++;
+    }
+    if (chunk) {
+        carte.add_user_to_chunk(x, y); // on y entre
+    } else {
+        print_error("Chunk introuvable après ", attempts, " tentatives : (", x, ",", y, ")");
+    }
+
+    return chunk;
 }
 
-void MapManager::demander_deload_chunk(int x, int y) {
+
+void MapManager::demander_deload_chunk(int x, int y, bool sort_du_chunk) {
+    if (sort_du_chunk) carte.supp_user_to_chunk(x, y);
     {
         std::lock_guard<std::mutex> lock(mtx_chunks);
         chunks_a_deload_share.emplace_back(x, y);
     }
-    time_manager->signal_event(); // réveille le thread si besoin
+    time_manager->signal_event();
 }
+
+
+std::vector<Chunk*> MapManager::demander_load_chunk(const std::vector<std::pair<int, int>>& chunks, bool entre_dans_le_chunk) {
+    {
+        std::lock_guard<std::mutex> lock(mtx_chunks);
+        for (const auto& c : chunks) {
+            chunks_a_load_share.emplace_back(c);
+        }
+    }
+    time_manager->signal_event();
+
+    std::vector<Chunk*> result;
+    if (!entre_dans_le_chunk) return result;
+
+    for (const auto& [x, y] : chunks) {
+        Chunk* chunk = nullptr;
+        int attempts = 0;
+        while (!chunk && attempts < max_attempts) {
+            chunk = carte.get_chunk(x, y);
+            if (!chunk) sf::sleep(sf::milliseconds(time_between_attempts));
+            attempts++;
+        }
+        if (chunk) {
+            carte.add_user_to_chunk(x, y);
+        } else {
+            print_error("Chunk introuvable après demande multiple : (", x, ",", y, ")");
+        }
+
+        result.push_back(chunk);
+    }
+
+    return result;
+}
+
+
+void MapManager::demander_deload_chunk(const std::vector<std::pair<int, int>>& chunks, bool sort_du_chunk) {
+    if (sort_du_chunk){
+        for (const auto& [x, y] : chunks) {
+            carte.supp_user_to_chunk(x, y);
+        }
+    }
+    {
+        std::lock_guard<std::mutex> lock(mtx_chunks);
+        for (const auto& c : chunks) {
+            chunks_a_deload_share.emplace_back(c);
+        }
+    }
+    time_manager->signal_event();    
+}
+
+
 
 bool MapManager::chunk_existe(int x, int y){
     return fs::exists(world_file+"/"+std::to_string(x)+"x"+std::to_string(y)+".json");
@@ -105,12 +175,13 @@ void MapManager::create_chunk(int x, int y){
 }
 
 void MapManager::load_chunk(int x, int y){
-    print_secondaire("load chunk ",x,"x",y);
+    print_secondaire("load chunk dans map manager ",x,"x",y);
     if(!chunk_existe(x,y)){
+        print_secondaire_attention("chunk non existant,creation de ",x,"x",y," en json");
         create_chunk(x,y);
     }
-    verif_et_creer_autour_chunk(x,y);
     carte.load_chunk(x,y);
+    verif_et_creer_autour_chunk(x,y);
 }
 
 void MapManager::load_all_chunk_from_liste(std::vector<std::pair<int, int>> chunks){
@@ -132,6 +203,10 @@ void MapManager::verif_et_creer_autour_chunk(int xx, int yy){
     }
 }
 
+void MapManager::decharge_chunk_pas_utilise(){
+    carte.decharge_chunk_pas_utilise();
+}
+
 void MapManager::start() {
     print_primaire("Demarage Map Manager!");
     while (time_manager->status()) {
@@ -147,7 +222,8 @@ void MapManager::start() {
         if(!chunks_a_deload_local.empty())deload_all_chunk_from_liste(chunks_a_deload_local);
 
         if (time_manager->get_date() % cycle_jour_nuit == 0) {
-            // cycle jour/nuit
+            decharge_chunk_pas_utilise();
+            //inverse_jour();
         }
         time_manager->wait_condition_and_tick(cycle_jour_nuit, [&]() {
             std::lock_guard<std::mutex> lock(mtx_chunks);

@@ -3,8 +3,9 @@
 
 #define PRINT_primaire true
 #define PRINT_secondaire true
+#define PRINT_secondaire_attention false
 #define PRINT_test true
-#define PRINT_error true
+#define PRINT_error false
 #define PRINT_status true
 
 // Couleurs ANSI
@@ -38,7 +39,7 @@ inline void print_secondaire(const Args&... args) {
 
 template<typename... Args>
 inline void print_secondaire_attention(const Args&... args) {
-    if constexpr (PRINT_secondaire) {
+    if constexpr (PRINT_secondaire_attention) {
         std::cout << COLOR_PINK;
         (std::cout << ... << args);
         std::cout << COLOR_RESET << std::endl;
@@ -60,6 +61,15 @@ inline void print_status(bool in_progress, const Args&... args) {
     std::cout << COLOR_STATUS;
     (std::cout << ... << args);
     std::cout << (in_progress ? " ..." : " Done!") << COLOR_RESET << std::endl;
+}
+
+template<typename... Args>
+inline void print_test(const Args&... args) {
+    if constexpr (PRINT_error) {
+        std::cout << COLOR_PINK<<"Test:";
+        (std::cout << ... << args);
+        std::cout << COLOR_RESET << std::endl;
+    }
 }
 
 // le par default non controlable

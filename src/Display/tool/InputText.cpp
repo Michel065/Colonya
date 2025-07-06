@@ -63,3 +63,19 @@ std::string InputText::get_value() const {
 void InputText::set_valid(bool ok) {
     box.setFillColor(ok ? sf::Color(200, 200, 200) : sf::Color(255, 100, 100));
 }
+
+bool InputText::is_valid() {
+    if (value.empty()) {
+        set_valid(false);
+        return false;
+    }
+
+    const std::string forbidden = "<>:\"/\\|?*";
+    if (value.find_first_of(forbidden) != std::string::npos || value.back() == '.' || value.back() == ' ') {
+        set_valid(false);
+        return false;
+    }
+
+    set_valid(true);
+    return true;
+}

@@ -10,6 +10,7 @@ public:
     void draw(sf::RenderWindow& window) const override;
     bool is_hovered(sf::Vector2f) const override { return false; }
     std::string get_label() const;
+    void set_text(std::string text);
 
 private:
     sf::Text label;
