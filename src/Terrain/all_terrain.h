@@ -5,7 +5,7 @@
 
 #include "types/Eau.h"
 #include "types/Sable.h"
-#include "types/Plaine.h"
+#include "types/Terre.h"
 #include "types/Herbe.h"
 #include "types/Roche.h"
 #include "types/Montagne.h"

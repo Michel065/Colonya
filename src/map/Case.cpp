@@ -10,17 +10,17 @@ Case::~Case() {
 }
 
 void Case::delete_ressource(){
-    delete ressource;
+    if(ressource)delete ressource;
     ressource=nullptr;
 }
 
 void Case::delete_structure(){
-    delete structure;
+    if(structure)delete structure;
     structure=nullptr;
 }
 
 void Case::delete_terrain(){
-    delete terrain;
+    // delete terrain; ca c pas bien mais c pas important
     terrain=nullptr;
 }
 
@@ -35,19 +35,25 @@ void Case::set_terrain(Terrain* ter) {
 }
 
 bool Case::set_ressource(Ressource* res,bool force){
-    if(force || (structure == nullptr && ressource == nullptr && constructible)){
+    if(force || (structure == nullptr && ressource == nullptr && is_constructible())){
         if(force)delete_ressource();
+        if(force)delete_structure();
         ressource=res;
         return true;
     }else return false;
 }
 
 bool Case::set_structure(Structure* stru,bool force){
-    if(force || (structure == nullptr && ressource == nullptr && constructible)){
+    if(force || (structure == nullptr && ressource == nullptr && is_constructible())){
+        if(force)delete_ressource();
         if(force)delete_structure();
         structure=stru;
         return true;
     }else return false;
+}
+
+void Case::set_terrain_doit_evoluer(bool val){
+    terrain_doit_evoluer=val;
 }
 
 Terrain* Case::get_terrain()const{
@@ -84,14 +90,44 @@ void Case::update() {
     if (terrain) terrain->update(*this);
     if (ressource) ressource->update(*this);
     if (structure) structure->update(*this);
-    constructible = terrain && terrain->contructible;
+
+    if(terrain && terrain_doit_evoluer){
+        terrain=TerrainManager::get(terrain->get_terrain_apres_evolution());
+        terrain_doit_evoluer=false;
+    }
 }
 
 Case* Case::clone() const {
     Case* copy = new Case();
     copy->terrain = terrain; // partagé, pas copié
-    copy->constructible = constructible;
     copy->ressource = ressource ? ressource->clone() : nullptr;
     copy->structure = structure ? structure->clone() : nullptr;
     return copy;
+}
+
+bool Case::is_constructible(){
+    return terrain && terrain->contructible && structure==nullptr && ressource==nullptr;
+}
+
+bool Case::is_walkable(){
+    return terrain && terrain->walkable && structure==nullptr && ressource==nullptr;
+}
+
+std::vector<Action> Case::get_actions_disponibles(){
+    update();
+    std::vector<Action> actions;
+
+    // Si la case contient une ressource
+    if (ressource) {
+        auto a = ressource->get_actions_disponibles(ent);
+        actions.insert(actions.end(), a.begin(), a.end());
+    }
+
+    // Si la case contient une structure
+    if (structure) {
+        auto a = structure->get_actions_disponibles(ent);
+        actions.insert(actions.end(), a.begin(), a.end());
+    }
+
+    return actions;
 }

@@ -42,6 +42,7 @@ public:
 
     bool chunk_existe(int x, int y);
     void create_chunk(int x, int y);
+    std::pair<int, int> create_chunk_spawn(int x, int y);
     void load_chunk(int x, int y);
     void load_all_chunk_from_liste(std::vector<std::pair<int, int>> chunks);
     void deload_all_chunk_from_liste(std::vector<std::pair<int, int>> chunks);

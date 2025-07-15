@@ -144,8 +144,11 @@ int NewWorldScreen::handle_click(sf::Vector2f mouse_pos, DisplayManager* manager
                     param->decalage_humidity = decal->get_value();
 
                     print("[Generation] seed = ", param->seed, ", fichier = ", filename);
-
-                    Simulation* simu = new Simulation(filename, param);
+                    
+                    // Création unique de la simulation
+                    Simulation::create(filename,param);
+                    Simulation* simu = Simulation::get_instance();
+                    
                     manager->set_simu_in_simu_screen(simu);
                     print_status(false, "Paramètres valides, génération du monde");
                     manager->set_screen(Screen_enum::Simu);

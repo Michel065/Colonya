@@ -17,6 +17,18 @@ public:
         get_structures()[type] = creator;
     }
 
+    static std::vector<std::pair<std::string, std::string>> get_all_structure_textures() {
+        std::vector<std::pair<std::string, std::string>> result;
+        for (auto& [type, creator] : StructureManager::get_structures()) {
+            Structure* s = creator();
+            if (!s) continue;
+            result.push_back({s->get_name(), s->get_texture()});
+            delete s;
+        }
+        return result;
+    }
+
+
 private:
     inline static std::unordered_map<StructureType, StructureCreator> Structures;
     static std::unordered_map<StructureType, StructureCreator>& get_structures() {

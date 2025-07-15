@@ -1,16 +1,16 @@
-#ifndef _EAU_RESSOURCE_H
-#define _EAU_RESSOURCE_H
+#ifndef _POMME_RESSOURCE_H
+#define _POMME_RESSOURCE_H
 
 #include "../RessourceManager.h"
 
-class Eau : public Ressource {
+class Pomme : public Ressource {
 public:
-    Eau() : Ressource(RessourceType::EAU, RessourceInfoManager::get_info(RessourceType::EAU).utilisation_base) {}
+    Pomme() : Ressource(RessourceType::POMME, RessourceInfoManager::get_info(RessourceType::POMME).utilisation_base) {}
 
     void consommer(Entite* ent) override {
         decremente_utilisation();
-        std::cout << "La créature boit de l'eau (" << get_nbr_utilisation() << " restantes)\n";
-        ent->boire(5);
+        std::cout << "La créature mange une pomme (" << get_nbr_utilisation() << " restantes)\n";
+        ent->manger(5);
     }
 
     std::vector<Action> get_actions_disponibles(Entite& e) override {
@@ -31,17 +31,17 @@ public:
     }
 
     Ressource* clone() const override {
-        return new Eau(*this);
+        return new Pomme(*this);
     }
 
     // Auto-enregistrement
-    static inline AutoRegisterRessource<Eau> reg{RessourceType::EAU};
-    static inline AutoRegisterInfo<Eau> info{
-        RessourceType::EAU,
+    static inline AutoRegisterRessource<Pomme> reg{RessourceType::POMME};
+    static inline AutoRegisterInfo<Pomme> info{
+        RessourceType::POMME,
         RessourceInfo{
-            "Eau",
-            20,
-            textures_file + "eau.jpg"
+            "Pomme",
+            5,
+            textures_file + "pomme.jpg"
         }
     };
 };

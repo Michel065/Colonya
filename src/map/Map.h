@@ -20,6 +20,7 @@ private:
     mutable std::shared_mutex mutex;
 
     std::pair<int, int> chunk_spawn={0,0};
+    std::pair<int, int> coord_spawn={0,0};
 
 public:
 
@@ -41,7 +42,10 @@ public:
     void deload_chunk_from_liste(std::vector<std::pair<int, int>> chunks);
     void decharge_chunk_pas_utilise();
     void set_chunk_spawn(std::pair<int, int> chunk_spaw);
+    void set_coord_spawn(std::pair<int, int> coord_spaw);
+    
     std::pair<int, int> get_chunk_spawn();
+    std::pair<int, int> get_coord_spawn()const;
 
 
     void print_chunks_load();

@@ -41,7 +41,18 @@ void Ressource::set_time_manager(TimeManager* time){
     time_manager=time;
 }
 
+std::vector<Action> Ressource::get_actions_disponibles(Entite& e) {
+    std::vector<Action> actions;
 
+    actions.emplace_back(
+        "consommer " + get_name(),
+        [this](Entite& ent) {
+            this->consommer(&ent);
+        }
+    );
+
+    return actions;
+}
 
 
 

@@ -20,6 +20,14 @@ std::string Structure::get_texture(){
     return StructureInfoManager::get_info(type).texture_path;
 }
 
+int Structure::get_taille_x(){
+    return StructureInfoManager::get_info(type).taille_x;
+}
+
+int Structure::get_taille_y(){
+    return StructureInfoManager::get_info(type).taille_y;
+}
+
 std::string Structure::get_name()const{
     return (StructureInfoManager::get_info(type)).nom;
 }

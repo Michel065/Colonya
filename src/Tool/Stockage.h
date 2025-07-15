@@ -7,21 +7,18 @@
 class Stockage {
 private:
     std::deque<Ressource*> data;
-    mutable std::mutex mtx;
-    size_t  capacite_max;
+    size_t capacite_max;
 
 public:
     explicit Stockage(int max = 5) : capacite_max(static_cast<size_t>(max)) {}
 
     bool ajouter(Ressource* value) {
-        std::lock_guard<std::mutex> lock(mtx);
         if (data.size() >= capacite_max) return false;
         data.push_back(value);
         return true;
     }
 
     bool retirer_type(RessourceType type, Ressource*& value) {
-        std::lock_guard<std::mutex> lock(mtx);
         for (auto it = data.begin(); it != data.end(); ++it) {
             if ((*it)->get_type() == type) {
                 value = *it;
@@ -34,7 +31,6 @@ public:
     }
 
     bool retirer(Ressource*& value) {
-        std::lock_guard<std::mutex> lock(mtx);
         if (data.empty()) return false;
         value = data.front();
         data.pop_front();
@@ -42,17 +38,14 @@ public:
     }
 
     bool est_plein() const {
-        std::lock_guard<std::mutex> lock(mtx);
         return data.size() >= capacite_max;
     }
 
     bool est_vide() const {
-        std::lock_guard<std::mutex> lock(mtx);
         return data.empty();
     }
 
     int taille() const {
-        std::lock_guard<std::mutex> lock(mtx);
         return static_cast<int>(data.size());
     }
 
@@ -61,7 +54,6 @@ public:
     }
 
     std::vector<Ressource*> snapshot() const {
-        std::lock_guard<std::mutex> lock(mtx);
         std::vector<Ressource*> result;
         result.reserve(data.size());
         for (auto& r : data) {
@@ -71,7 +63,6 @@ public:
     }
 
     std::vector<RessourceType> get_all_ressource() const {
-        std::lock_guard<std::mutex> lock(mtx);
         std::vector<RessourceType> result;
         result.reserve(data.size());
         for (auto& r : data) {
@@ -80,33 +71,64 @@ public:
         return result;
     }
 
-    void clear(bool lok=true) {
-        if(lok)std::lock_guard<std::mutex> lock(mtx);
+    void clear() {
         data.clear();
     }
 
-    std::string stringifie() const{
-        std::lock_guard<std::mutex> lock(mtx);
-        std::string result="[";
-        for (auto& r : data) {
-            result+=r->get_name()+", ";
+    void purge_ressources_supprimees() {
+        auto it = data.begin();
+        while (it != data.end()) {
+            if ((*it)->doit_etre_supprimee()) {
+                delete *it;
+                it = data.erase(it);
+            } else {
+                ++it;
+            }
         }
-        result+="]";
+    }
+
+    std::vector<Action> get_all_action_ressource(Entite& ent) {
+        purge_ressources_supprimees();
+
+        std::vector<Action> actions;
+        for (auto* res : data) {
+            if (res) {
+                auto a = res->get_actions_disponibles(ent);
+                actions.insert(actions.end(), a.begin(), a.end());
+            }
+        }
+
+        return actions;
+    }
+
+
+
+
+
+
+
+
+    std::string stringifie() const {
+        std::string result = "[";
+        for (auto& r : data) {
+            result += r->get_name() + ", ";
+        }
+        result += "]";
         return result;
     }
 
     friend void to_json(nlohmann::json& j, const Stockage& s);
     friend void from_json(const nlohmann::json& j, Stockage& s);
 
-    Stockage* clone(){
-        Stockage* tmp=new Stockage(static_cast<int>(capacite_max));
+    Stockage* clone() {
+        Stockage* tmp = new Stockage(static_cast<int>(capacite_max));
         for (auto& r : data) {
             tmp->ajouter(r->clone());
         }
         return tmp;
     }
 
-    void copy_from(const Stockage* tmp){
+    void copy_from(const Stockage* tmp) {
         clear();
         for (auto& r : tmp->snapshot()) {
             ajouter(r->clone());
@@ -114,9 +136,7 @@ public:
     }
 };
 
-
 inline void to_json(nlohmann::json& j, const Stockage& s) {
-    std::lock_guard<std::mutex> lock(s.mtx);
     j["capacite"] = s.capacite_max;
     j["data"] = nlohmann::json::array();
     for (const auto* r : s.data) {
@@ -125,8 +145,7 @@ inline void to_json(nlohmann::json& j, const Stockage& s) {
 }
 
 inline void from_json(const nlohmann::json& j, Stockage& s) {
-    std::lock_guard<std::mutex> lock(s.mtx);
-    s.clear(false);
+    s.clear();
     j.at("capacite").get_to(s.capacite_max);
     for (const auto& rjson : j.at("data")) {
         Ressource* r = nullptr;

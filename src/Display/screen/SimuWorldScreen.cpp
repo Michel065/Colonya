@@ -8,12 +8,15 @@ SimuWorldScreen::SimuWorldScreen(const sf::Font& font)
 {
     stop_button = new Button("Stop", font, {WINDOW_WIDTH - 100.f, 30.f}, {100.f, 40.f});
     tools.push_back(stop_button);
+    popup_case = new Popup_Case(font);
+    tools.push_back(popup_case);
+
     init_sprites();
 }
 
 SimuWorldScreen::~SimuWorldScreen() {
     for (Tool* t : tools) delete t;
-    if (simulation) delete simulation;
+    if (simulation) Simulation::destroy();
     for (auto& tx : liste_textures) delete tx;
 }
 
@@ -22,15 +25,20 @@ void SimuWorldScreen::set_simulation(Simulation* simu, DisplayManager* manager) 
     simulation = simu;
     if (!simulation->start()) {
         print_error("Échec du démarrage de la simulation (", simulation->get_name(), "). Retour au menu.");
-        delete simulation;
+        simulation->stop();
+        Simulation::destroy();
         simulation = nullptr;
-
         if (manager) manager->set_screen(Screen_enum::Menu);
         return;
     }
     print_primaire("Simulation lancée avec succès (", simulation->get_name(), ")");
     carte=simulation->get_carte();
     map_manager=simulation->get_map_manager();
+    auto coord = carte->get_coord_spawn();
+    centre_case_x = coord.first;
+    centre_case_y = coord.second;
+    print_primaire("coord: set simulation ",centre_case_x,"x",centre_case_y);
+
     update();
 }
 
@@ -124,7 +132,13 @@ void SimuWorldScreen::draw_fond(sf::RenderWindow& window) const {
             for (int ix = -largeur_visible_case_demi-1; ix <= largeur_visible_case_demi; ++ix) {
                 x=ix+decalage;
                 y=iy+decalage;
-                draw_case(window,get_texture_from_carte(x,y),x,y);
+                Case* c = get_case_from_carte_with_coord_visuel(x, y);
+                if (!c) continue;
+                draw_case_fond(window, c->get_terrain()->name, x, y);
+                if (c->get_structure()) {
+                    draw_case_structure(window, c->get_structure(), x, y);
+                }
+
             }
         }
     }
@@ -136,6 +150,19 @@ void SimuWorldScreen::draw(sf::RenderWindow& window) const {
     for (auto* tool : tools) tool->draw(window);
 }
 
+Case* SimuWorldScreen::get_case_from_carte_with_coord_world(int world_x,int world_y) const {
+    auto chunk_name = carte->get_chunk_coords(world_x, world_y);
+    auto [case_x, case_y] = carte->get_local_coords(world_x, world_y);
+
+    auto it = chunks_utilises.find(chunk_name);
+    if (it == chunks_utilises.end()) {
+        print_error("Chunk non chargé pour la case (", world_x, ",", world_y, ")");
+        return nullptr;
+    }
+
+    return it->second->at(case_x, case_y);
+}
+
 int SimuWorldScreen::handle_click(sf::Vector2f mouse_pos, DisplayManager* manager) {
     for (Tool* t : tools) {
         if (t->is_hovered(mouse_pos)) {
@@ -143,23 +170,28 @@ int SimuWorldScreen::handle_click(sf::Vector2f mouse_pos, DisplayManager* manage
             if (t == stop_button && manager) {
                 manager->draw_loading_screen();
                 simulation->stop();
+                Simulation::destroy();
                 manager->set_screen(Screen_enum::Menu);
             }
         }
     }
 
-    /*if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-        sf::Vector2f mouse_coord_ecran = conv_coord_pixel_en_coord_visuel(mouse_pos);
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        sf::Vector2f pos_visu = conv_coord_pixel_en_coord_realative_au_centre(mouse_pos);
+        int case_x = pos_visu.x + centre_case_x;
+        int case_y = pos_visu.y + centre_case_y;
 
-        auto [case_x, case_y] = visu_to_monde(mouse_coord_ecran.x, mouse_coord_ecran.y);
-        auto [chunk_x, chunk_y] = carte->get_chunk_coords(case_x, case_y);
+        print_primaire("case:",case_x,"x",case_y);
 
-        print_primaire("Click gauche détecté sur la case :", case_x, "x", case_y," centre:",centre_case_x,"x",centre_case_y);
-        print_primaire("texture dnas la case:", case_x, "x", case_y," text:",get_texture_from_carte(mouse_coord_ecran.x, mouse_coord_ecran.y));
-        print_primaire("=> Appartient au chunk :", chunk_x, "x", chunk_y);
-    }*/
+        Case* c = get_case_from_carte_with_coord_world(case_x, case_y);
 
-
+        if (c) {
+            popup_case->set_case(c);
+            popup_case->set_visible(true);
+        } else {
+            popup_case->set_visible(false);
+        }
+    }
 
     return -1;
 }
@@ -173,7 +205,7 @@ void SimuWorldScreen::handle_camera_movement() {
 
 
 void SimuWorldScreen::handle_zoom(float delta) {
-    if (delta < 0 && largeur_visible_case_demi<10) { // Zoom avant = voir plus large
+    if (delta < 0 && largeur_visible_case_demi<20) { // Zoom avant = voir plus large
         print_secondaire("on zoom en arriere");
         largeur_visible_case_demi++;
         hauteur_visible_case_demi++;
@@ -188,6 +220,11 @@ void SimuWorldScreen::handle_zoom(float delta) {
 void SimuWorldScreen::handle_event(const sf::Event& event) {
     if (event.type == sf::Event::KeyPressed) {
         handle_camera_movement();
+    
+        if (event.key.code == sf::Keyboard::Space && popup_case->is_visible()) {
+            popup_case->fermer();
+        }
+    
         if (event.key.code == sf::Keyboard::Add || event.key.code == sf::Keyboard::Equal)
             handle_zoom(0.1f);
         if (event.key.code == sf::Keyboard::Subtract || event.key.code == sf::Keyboard::Dash)
@@ -196,14 +233,15 @@ void SimuWorldScreen::handle_event(const sf::Event& event) {
     }
 
     if (event.type == sf::Event::MouseWheelScrolled) {
-        handle_zoom(event.mouseWheelScroll.delta > 0 ? -0.1f : 0.1f);
+        handle_zoom(event.mouseWheelScroll.delta > 0 ? 0.1f : -0.1f);
         update();
     }
 }
 
 void SimuWorldScreen::init_sprites() {
+    
+    // === TERRAIN ===
     const auto& terrains = TerrainManager::get_liste_terrain();
-
     for (const auto& name : terrains) {
         Terrain* terrain = TerrainManager::get(name);
         if (!terrain) continue;
@@ -217,6 +255,21 @@ void SimuWorldScreen::init_sprites() {
             continue;
         }
         
+        sprite.setTexture(*texture, true);
+        sprites_reutilisables[name] = sprite;
+        liste_textures.push_back(texture);
+    }
+
+    // === STRUCTURE ===
+    auto textures_structure = StructureManager::get_all_structure_textures();
+    for (const auto& [name, chemin] : textures_structure) {
+        sf::Texture* texture = new sf::Texture();
+        if (!texture->loadFromFile(chemin)) {
+            print_error("Erreur de chargement de la texture structure : ", chemin);
+            delete texture;
+            continue;
+        }
+        sf::Sprite sprite;
         sprite.setTexture(*texture, true);
         sprites_reutilisables[name] = sprite;
         liste_textures.push_back(texture);
@@ -248,11 +301,19 @@ void SimuWorldScreen::update(){
     print_chunk_charge();
 }
 
-/*sf::Vector2f SimuWorldScreen::conv_coord_pixel_en_coord_visuel(sf::Vector2f pos_pixel) const {
-    float coord_x =     (pos_pixel.x - WINDOW_WIDTH / 2.0f + pixels_par_case_x/2)/ pixels_par_case_x;
-    float coord_y =     (pos_pixel.y - WINDOW_HEIGHT / 2.0f + pixels_par_case_y/2)/ pixels_par_case_y;
-    return sf::Vector2f(coord_x, coord_y);
-}*/
+sf::Vector2f SimuWorldScreen::conv_coord_pixel_en_coord_realative_au_centre(sf::Vector2f pos_pixel) const {
+    float dx = pos_pixel.x - WINDOW_WIDTH / 2.0f;
+    float dy = pos_pixel.y - WINDOW_HEIGHT / 2.0f;
+
+    float case_x = (dx / (pixels_par_case_x / 2.0f) + dy / (pixels_par_case_y / 2.0f)) / 2.0f;
+    float case_y = (dy / (pixels_par_case_y / 2.0f) - dx / (pixels_par_case_x / 2.0f)) / 2.0f;
+
+    int x_arrondi = std::round(case_x);
+    int y_arrondi = std::round(case_y);
+    return sf::Vector2f(x_arrondi, y_arrondi);
+}
+
+
 
 sf::Vector2f SimuWorldScreen::conv_coord_visuel_en_coord_pixel(float case_x, float case_y) const {
     /*// on bouge le fond
@@ -267,7 +328,7 @@ sf::Vector2f SimuWorldScreen::conv_coord_visuel_en_coord_pixel(float case_x, flo
     return sf::Vector2f(pixel_x, pixel_y);
 }
 
-void SimuWorldScreen::draw_case(sf::RenderWindow& window,std::string name_texture, float x, float y) const{
+void SimuWorldScreen::draw_case_fond(sf::RenderWindow& window,std::string name_texture, float x, float y) const{
     auto it = sprites_reutilisables.find(name_texture);
     if (it == sprites_reutilisables.end()) {
         print_error("Texture introuvable : ", name_texture);
@@ -281,25 +342,33 @@ void SimuWorldScreen::draw_case(sf::RenderWindow& window,std::string name_textur
     window.draw(sprite);
 }
 
-std::string SimuWorldScreen::get_texture_from_carte(float dx, float dy) const {
+Case* SimuWorldScreen::get_case_from_carte_with_coord_visuel(float dx, float dy) const {
     auto [world_x, world_y] = visu_to_monde(dx, dy);
-
-    auto chunk_name = carte->get_chunk_coords(world_x, world_y);
-    auto [case_x, case_y] = carte->get_local_coords(world_x, world_y);
-
-    auto it = chunks_utilises.find(chunk_name);
-    if (it == chunks_utilises.end()) {
-        print_error("Chunk non chargé pour la case (", world_x, ",", world_y, ")");
-        return "defaut";
-    }
-
-    Chunk* chunk = it->second;
-    Case* c = chunk->at(case_x, case_y);
-    if (!c) {
-        print_error("Case introuvable dans le chunk !");
-        return "defaut";
-    }
-
-    return c->get_terrain()->name;
+    return get_case_from_carte_with_coord_world(world_x,world_y);
 }
 
+void SimuWorldScreen::draw_case_structure(sf::RenderWindow& window, Structure* s, float x, float y) const {
+    std::string name_texture = s->get_name();
+
+    auto it = sprites_reutilisables.find(name_texture);
+    if (it == sprites_reutilisables.end()) {
+        print_error("Texture structure introuvable : ", name_texture);
+        return;
+    }
+
+    sf::Sprite sprite = it->second;
+    sf::Vector2f pos_pixel = conv_coord_visuel_en_coord_pixel(x, y);
+
+    float scale_ratio = std::min(pixels_par_case_x / s->get_taille_x(), pixels_par_case_y / s->get_taille_y());
+
+    sprite.setScale(scale_ratio, scale_ratio);
+
+    sf::FloatRect bounds = sprite.getGlobalBounds();
+    // Tu veux que le centre du sprite soit à pos_pixel → donc tu déplaces le coin haut gauche :
+    sprite.setPosition(
+        pos_pixel.x + (pixels_par_case_x-bounds.width)/2 ,
+        pos_pixel.y
+    );
+
+    window.draw(sprite);
+}

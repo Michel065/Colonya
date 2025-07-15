@@ -202,12 +202,20 @@ void Map::decharge_chunk_pas_utilise() {
     }
 }
 
+void Map::set_coord_spawn(std::pair<int, int> coord_spaw){
+    coord_spawn=coord_spaw;
+}
+
 void Map::set_chunk_spawn(std::pair<int, int> chunk_spaw){
     chunk_spawn=chunk_spaw;
 }
 
 std::pair<int, int> Map::get_chunk_spawn(){
     return chunk_spawn;
+}
+
+std::pair<int, int> Map::get_coord_spawn()const{
+    return coord_spawn;
 }
 
 

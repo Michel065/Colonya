@@ -2,6 +2,8 @@
 #define _RESSOURCE_H 
 
 #include "../Commun/includes.h"
+#include "../Tool/Action.h"
+
 #include "../Synchronisation/TimeManager.h"
 
 #include "./RessourceType.h"
@@ -32,7 +34,8 @@ public:
     std::string get_name()const;
     RessourceInfo& get_info();
 
-    virtual void consommer(Entite* ent,Case& c) = 0;
+    virtual std::vector<Action> get_actions_disponibles(Entite& e) = 0;
+    virtual void consommer(Entite* ent) = 0;
     virtual bool doit_etre_supprimee() const;
     virtual void update(Case& c) = 0;
 

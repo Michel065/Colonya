@@ -6,13 +6,16 @@
 #include "../Terrain/TerrainManager.h"
 #include "../Ressource/RessourceManager.h"
 #include "../Structure/StructureManager.h"
+#include "../Tool/Action.h"
 
 class Case {
 private:
     Terrain* terrain = nullptr;
     Ressource* ressource = nullptr;
     Structure* structure = nullptr;
-    bool constructible=true;
+
+    bool terrain_doit_evoluer=false;
+
 public:
     Case();
     ~Case();
@@ -22,6 +25,7 @@ public:
     void set_terrain(Terrain* ter);
     bool set_ressource(Ressource* ter,bool force=false);
     bool set_structure(Structure* ter,bool force=false);
+    void set_terrain_doit_evoluer(bool val);
 
     Terrain* get_terrain()const;
     Ressource* get_ressource()const;
@@ -32,7 +36,13 @@ public:
     void delete_structure();
     void delete_terrain();
 
+    bool is_constructible();
+
+    bool is_walkable();
+
     void update();
+
+    std::vector<Action> get_actions_disponibles();
 
     Case* clone() const;
 };
@@ -46,7 +56,10 @@ inline void to_json(json& j, const Case& c) {
     else j["ressource"] = nullptr;
 
     Structure* tmp2=c.get_structure();
-    if (tmp2) j["structure"] = *tmp2;
+    if (tmp2){ 
+        print_primaire("case hub en theorie: il y a une structure");
+        j["structure"] = *tmp2;
+    }
     else j["structure"] = nullptr;
 }
 
