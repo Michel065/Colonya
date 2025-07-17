@@ -61,21 +61,50 @@ public:
         stockage.clear();
     }
 
-    std::string stringifie() const {
-        std::lock_guard<std::mutex> lock(mtx);
-        return stockage.stringifie();
-    }
-
     void purge_ressources_supprimees() {
         std::lock_guard<std::mutex> lock(mtx);
         stockage.purge_ressources_supprimees();
     }
 
-    std::vector<Action> get_all_action_ressource(Entite& ent) {
+    std::vector<Action> get_all_action_ressource() {
         std::lock_guard<std::mutex> lock(mtx);
-        return stockage.get_all_action_ressource(ent);
+        return stockage.get_all_action_ressource();
     }
+
+    std::string stringifie() const {
+        std::lock_guard<std::mutex> lock(mtx);
+        return stockage.stringifie();
+    }
+
+    StockageShare* clone() {
+        StockageShare* tmp = new StockageShare(stockage.capacite());
+        for (auto& r : stockage.snapshot()) {
+            tmp->ajouter(r->clone());
+        }
+        return tmp;
+    }
+
+    void copy_from(const StockageShare* tmp) {
+        clear();
+        for (auto& r : tmp->snapshot()) {
+            ajouter(r->clone());
+        }
+    }
+    
+
+    friend void to_json(nlohmann::json& j, const StockageShare& s);
+    friend void from_json(const nlohmann::json& j, StockageShare& s);
 };
+
+inline void to_json(nlohmann::json& j, const StockageShare& s) {
+    std::lock_guard<std::mutex> lock(s.mtx);
+    to_json(j, s.stockage);
+}
+
+inline void from_json(const nlohmann::json& j, StockageShare& s) {
+    std::lock_guard<std::mutex> lock(s.mtx);
+    from_json(j, s.stockage);
+}
 
 
 #endif

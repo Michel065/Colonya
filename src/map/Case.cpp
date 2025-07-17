@@ -109,18 +109,33 @@ bool Case::is_constructible(){
     return terrain && terrain->contructible && structure==nullptr && ressource==nullptr;
 }
 
-bool Case::is_walkable(){
+bool Case::is_walkable() const{
     return terrain && terrain->walkable && structure==nullptr && ressource==nullptr;
 }
 
-std::vector<Action> Case::get_actions_disponibles(){
+Observation Case::observer() const {
+    if (structure) {
+        return { structure->get_name(),false};
+    }
+    if (ressource) {
+        return { ressource->get_name(),false};
+    }
+    return { "vide",is_walkable()};
+}
+
+
+std::vector<Action> Case::get_actions_disponibles(Entite& ent){
     update();
     std::vector<Action> actions;
-
     // Si la case contient une ressource
     if (ressource) {
-        auto a = ressource->get_actions_disponibles(ent);
-        actions.insert(actions.end(), a.begin(), a.end());
+        std::string nom = "prendre " + ressource->get_name();
+        actions.emplace_back(nom, [this](Entite& e) {
+            if (ressource) {
+                e.ajouter_inventaire(ressource);
+                ressource = nullptr;
+            }
+        });
     }
 
     // Si la case contient une structure
@@ -128,6 +143,5 @@ std::vector<Action> Case::get_actions_disponibles(){
         auto a = structure->get_actions_disponibles(ent);
         actions.insert(actions.end(), a.begin(), a.end());
     }
-
     return actions;
 }

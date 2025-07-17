@@ -2,7 +2,7 @@
 #include "../../Simu/Simu.h"
 
 Hub::Hub(Map* map, TimeManager* tm) 
-    : Structure(StructureType::HUB,
+    : Habitation(StructureType::HUB,
                 StructureInfoManager::get_info(StructureType::HUB).nbr_de_base_de_coup_avant_fin_construction,
                 StructureInfoManager::get_info(StructureType::HUB).state_de_base),
       stockage(taille_inv) {
@@ -36,7 +36,7 @@ std::vector<RessourceType> Hub::get_all_ressource() const {
     return stockage.get_all_ressource();
 }
 
-const Stockage* Hub::get_stockage() const {
+const StockageShare* Hub::get_stockage() const {
     return &stockage;
 }
 
@@ -100,7 +100,7 @@ std::vector<Action> Hub::get_actions_disponibles(Entite& e) {
         });
     }
 
-    auto ressources_entite = e.inventaire.get_all_ressource();
+    auto ressources_entite = e.voir_toute_ressource_inventaire();
     for (auto type : ressources_entite) {
         std::string nom = "deposer " + RessourceInfoManager::get_info(type).nom;
         actions.emplace_back(nom, [this, &e, type](Entite& ent) {
@@ -116,7 +116,7 @@ std::vector<Action> Hub::get_actions_disponibles(Entite& e) {
 
 nlohmann::json Hub::get_json() const {
     nlohmann::json j;
-    j["stockage"] = stockage;
+    j["stockage_share"] = stockage;
 
     {
         std::lock_guard<std::mutex> lock(mtx_entite);
@@ -130,8 +130,8 @@ nlohmann::json Hub::get_json() const {
 }
 
 void Hub::from_json(nlohmann::json json) {
-    if (json.contains("stockage"))
-        json.at("stockage").get_to(stockage);
+    if (json.contains("stockage_share"))
+        json.at("stockage_share").get_to(stockage);
 
     Simulation* simu = Simulation::get_instance();
     if (simu) {

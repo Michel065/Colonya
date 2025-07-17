@@ -6,7 +6,8 @@
 
 class Habitation : public Structure {
 public:
-    using Structure::Structure;
+    Habitation(StructureType t, int nbr_coup_avant_fin_constructio = 0, StructureState state = StructureState::EN_CONSTRUCTION)
+            : Structure(t, nbr_coup_avant_fin_constructio, state) {}
 
     virtual bool peut_entrer(Entite* e) const = 0;
     virtual bool entrer(Entite* e) = 0;

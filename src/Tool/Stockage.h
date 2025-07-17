@@ -87,13 +87,13 @@ public:
         }
     }
 
-    std::vector<Action> get_all_action_ressource(Entite& ent) {
+    std::vector<Action> get_all_action_ressource() {
         purge_ressources_supprimees();
 
         std::vector<Action> actions;
         for (auto* res : data) {
             if (res) {
-                auto a = res->get_actions_disponibles(ent);
+                auto a = res->get_actions_disponibles();
                 actions.insert(actions.end(), a.begin(), a.end());
             }
         }

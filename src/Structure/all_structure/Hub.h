@@ -7,11 +7,6 @@
 #include "../../Map/Map.h"
 #include "../types/Habitation.h"
 
-/*
-Remarque : dormir dans le Hub bloque la créature tant que ses jauges ne sont pas remplies,
-avec malus faim/soif pendant la durée de sommeil.
-*/
-
 class Hub : public Habitation {
 private:
     int taille_inv = 5;

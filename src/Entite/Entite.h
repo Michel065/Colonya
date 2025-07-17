@@ -5,8 +5,11 @@
 #include "../Tool/Action.h"
 #include "../Tool/Stockage.h"
 
+#include "Observation.h"
+
 class Case;
 class Chunk;
+class MapManager;
 class Map;
 class TimeManager; 
 class Habitation;
@@ -25,6 +28,7 @@ protected:
     int pos_y = 0;
     float orientation_vue = 0.0f; 
     float distance_vision = 5.0f;
+    int portee_action=1;
     float demi_angle = 30.0f;
 
     int faim_max = 100;
@@ -39,17 +43,19 @@ protected:
 
     std::unordered_map<std::pair<int, int>, Chunk*, pair_hash> chunks_utilises;
 
-    Map* map = nullptr;
+    MapManager* map_manager = nullptr;
+    Map* carte = nullptr;
     TimeManager* time_manager = nullptr;
     Habitation* sleep_provider = nullptr;
 
     Stockage inventaire;
+    std::vector<Observation> observations;
 
 public:
     Entite(std::string nam = "Tom", int x = 0, int y = 0);
     virtual ~Entite();
 
-    void set_map(Map* m);
+    void set_map_manager(MapManager* mm);
     void set_time_manager(TimeManager* tm);
 
     std::string get_name() const;
@@ -74,8 +80,10 @@ public:
 
     std::vector<std::pair<int, int>> prendre_vision() const;
     Case* get_case_from_carte_with_coord_world(int world_x,int world_y) const;
-    std::vector<Action> calculer_actions_possibles(const std::vector<std::pair<int, int>>& coords) const;
-    std::vector<Action> action_disponible_entite() const;
+    bool case_dans_portee(int x_case, int y_case) const;
+    std::vector<Action> calculer_actions_possibles(const std::vector<std::pair<int, int>>& coords);
+    std::vector<Action> action_disponible_entite();
+    std::vector<Action> action_disponible_avec_ressource_inventaire();
     std::map<std::string, std::pair<int, int>> calculer_action_deplacement() const;
     
     virtual Action prise_de_decision(const std::vector<Action>& actions) = 0;
@@ -105,6 +113,7 @@ public:
     void tourner_a_droite();
     void move_dir(int dx, int dy);
 
+    std::vector<RessourceType> voir_toute_ressource_inventaire();
     bool ajouter_inventaire(Ressource* res);
     bool retirer_type_inventaire(RessourceType type,Ressource* res);
     

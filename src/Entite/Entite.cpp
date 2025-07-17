@@ -1,4 +1,5 @@
 #include "Entite.h"
+#include "../Map/MapManager.h"
 #include "../Map/Map.h"
 #include "../Map/Chunk.h"
 #include "../Map/Case.h"
@@ -11,7 +12,12 @@ Entite::Entite(std::string nam, int x, int y)
 
 Entite::~Entite() {}
 
-void Entite::set_map(Map* m) {map = m;}
+void Entite::set_map_manager(MapManager* mm){
+    map_manager=mm;
+    if(map_manager){
+        carte=map_manager->get_map();
+    }
+}
 void Entite::set_time_manager(TimeManager* tm) {time_manager = tm;}
 
 std::string Entite::get_name() const {return name;}
@@ -77,7 +83,7 @@ void Entite::actualiser_chunks_utilises(const std::vector<std::pair<int, int>>& 
 
     for (const auto& chunk_coord : nouveaux_chunks) {
         if (!chunks_utilises.count(chunk_coord)) {
-            Chunk* ch = map->demander_load_chunk(chunk_coord.first, chunk_coord.second, true);
+            Chunk* ch = map_manager->demander_load_chunk(chunk_coord.first, chunk_coord.second, true);
             if (ch) {
                 chunks_utilises[chunk_coord] = ch;
             }
@@ -86,7 +92,7 @@ void Entite::actualiser_chunks_utilises(const std::vector<std::pair<int, int>>& 
 
     for (auto it = chunks_utilises.begin(); it != chunks_utilises.end(); ) {
         if (!nouveaux_chunks.count(it->first)) {
-            map->demander_load_chunk(it->first.first, it->first.second, false);
+            map_manager->demander_load_chunk(it->first.first, it->first.second, false);
             it = chunks_utilises.erase(it);
         } else {
             ++it;
@@ -95,7 +101,7 @@ void Entite::actualiser_chunks_utilises(const std::vector<std::pair<int, int>>& 
 }
 
 void Entite::run() {
-    while (time_manager && time_manager->running() && is_alive()) {
+    while (time_manager && time_manager->status() && is_alive()) {
         time_manager->waitNextTick();
 
         if (sleep_provider) {
@@ -114,9 +120,6 @@ void Entite::run() {
 
 std::vector<std::pair<int, int>> Entite::prendre_vision() const {
     std::vector<std::pair<int, int>> resultats;
-
-    const float orientation_rad = orientation_vue * (M_PI / 180.0f);  // Conversion en radians
-
     for (int dx = -distance_vision; dx <= distance_vision; ++dx) {
         for (int dy = -distance_vision; dy <= distance_vision; ++dy) {
             int tx = pos_x + dx;
@@ -160,12 +163,25 @@ Case* Entite::get_case_from_carte_with_coord_world(int world_x,int world_y) cons
     return it->second->at(case_x, case_y);
 }
 
-std::vector<Action> Entite::calculer_actions_possibles(const std::vector<std::pair<int, int>>& coords) const {
+bool Entite::case_dans_portee(int x_case, int y_case) const {
+    int dx = pos_x - x_case;
+    int dy = pos_y - y_case;
+    int dist2 = dx * dx + dy * dy;
+    return dist2 <= portee_action * portee_action;  // portee_action en cases (par défaut 1 ?)
+}
+
+std::vector<Action> Entite::calculer_actions_possibles(const std::vector<std::pair<int, int>>& coords) {
     std::vector<Action> actions;
 
     for (const auto& [x, y] : coords) {
         Case* c = get_case_from_carte_with_coord_world(x, y);
         if (c) {
+            if (!case_dans_portee(x, y)) {
+                Observation obs = c->observer();
+                obs.complete_coord(x, y);
+                observations.push_back(obs);
+                continue;
+            }
             auto actions_case = c->get_actions_disponibles(*this);
             actions.insert(actions.end(), actions_case.begin(), actions_case.end());
         }
@@ -236,12 +252,12 @@ std::map<std::string, std::pair<int, int>> Entite::calculer_action_deplacement()
     return dir_map;
 }
 
-std::vector<Action> Entite::action_disponible_avec_ressource_inventaire() const {
-    return inventaire.get_all_action_ressource(const_cast<Entite&>(*this));
+std::vector<Action> Entite::action_disponible_avec_ressource_inventaire() {
+    return inventaire.get_all_action_ressource();
 }
 
 
-std::vector<Action> Entite::action_disponible_entite() const {
+std::vector<Action> Entite::action_disponible_entite() {
     std::vector<Action> actions;
 
     actions.emplace_back("tourner_a_gauche", [this](Entite& e) {
@@ -257,7 +273,7 @@ std::vector<Action> Entite::action_disponible_entite() const {
     for (const auto& [nom, delta] : dir_map) {
         int nx = pos_x + delta.first;
         int ny = pos_y + delta.second;
-        Case* c = get_case_from_carte_with_coord_world(x, y);
+        Case* c = get_case_from_carte_with_coord_world(nx, ny);
         if (c && c->is_walkable()) {
             actions.emplace_back(nom, [this, dx=delta.first, dy=delta.second](Entite& e) {
                 e.move_dir(dx, dy);
@@ -294,8 +310,12 @@ void Entite::set_sleep_provider(Habitation* hab){
     sleep_provider=hab;
 }
 
+std::vector<RessourceType> Entite::voir_toute_ressource_inventaire(){
+    return inventaire.get_all_ressource();
+}
+
 bool Entite::ajouter_inventaire(Ressource* res){
-    inventaire.ajouter(res)
+    return inventaire.ajouter(res);
 }
 
 bool Entite::retirer_type_inventaire(RessourceType type,Ressource* res){

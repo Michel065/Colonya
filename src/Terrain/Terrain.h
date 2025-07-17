@@ -27,7 +27,7 @@ public:
 
     virtual ~Terrain() = default;
 
-    virtual std::string get_terrain_apres_evolution()const {}
+    virtual std::string get_terrain_apres_evolution()const {return "defaut";}
     virtual void update(Case& c) const {}  // méthode virtuelle, on override dans les types
     virtual Terrain* clone() const = 0;
 

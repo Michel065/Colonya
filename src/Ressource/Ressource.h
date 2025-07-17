@@ -8,9 +8,11 @@
 
 #include "./RessourceType.h"
 #include "./RessourceInfoManager.h"
-#include "../Entite/Entite.h"
+
 
 struct Case;
+class Entite;
+
 
 class Ressource {
 protected:
@@ -34,8 +36,8 @@ public:
     std::string get_name()const;
     RessourceInfo& get_info();
 
-    virtual std::vector<Action> get_actions_disponibles(Entite& e) = 0;
-    virtual void consommer(Entite* ent) = 0;
+    std::vector<Action> get_actions_disponibles();
+    virtual void consommer(Entite& ent) = 0;
     virtual bool doit_etre_supprimee() const;
     virtual void update(Case& c) = 0;
 

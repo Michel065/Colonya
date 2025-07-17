@@ -38,11 +38,12 @@ public:
 
     bool is_constructible();
 
-    bool is_walkable();
+    bool is_walkable() const;
 
     void update();
 
-    std::vector<Action> get_actions_disponibles();
+    Observation observer() const ;
+    std::vector<Action> get_actions_disponibles(Entite& ent);
 
     Case* clone() const;
 };
