@@ -11,6 +11,8 @@ void start_Map_Manager(MapManager &mm);
 
 class Simulation {
 private:
+    static Simulation* instance;  // 🔹 l'instance unique
+
     std::string name;
     NoiseParam* param_generator = nullptr;
 
@@ -20,10 +22,18 @@ private:
     MapManager* map_manager = nullptr;
     TimeManager* time_manager = nullptr;
 
-public:
+    // 🔒 Constructeur privé interdit les new externes
     Simulation(std::string name, NoiseParam* param_generator = nullptr);
+
+public:
     ~Simulation();
 
+    // 🔹 Création/accès unique à l'instance
+    static void create(std::string name, NoiseParam* param_generator = nullptr);
+    static Simulation* get_instance();
+    static void destroy();
+
+    // ⏯️ Méthodes normales
     bool start();
     bool stop();
 
@@ -37,5 +47,6 @@ public:
     TimeManager* get_time_manager();
     MapManager* get_map_manager();
 };
+
 
 #endif

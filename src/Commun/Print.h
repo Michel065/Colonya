@@ -5,7 +5,7 @@
 #define PRINT_secondaire true
 #define PRINT_secondaire_attention false
 #define PRINT_test true
-#define PRINT_error false
+#define PRINT_error true
 #define PRINT_status true
 
 // Couleurs ANSI

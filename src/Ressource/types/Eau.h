@@ -5,33 +5,14 @@
 
 class Eau : public Ressource {
 public:
-    Eau() : Ressource(RessourceType::EAU, RessourceInfoManager::get_info(RessourceType::EAU).utilisation_base) {}
+    Eau();
 
-    void consommer(Entite* ent,Case& c) override {
-        decremente_utilisation();
-        std::cout << "La créature boit de l'eau (" << get_nbr_utilisation() << " restantes)\n";
+    void consommer(Entite& ent) override;
+    void update(Case& c) override;
+    Ressource* clone() const override;
 
-        update(c);
-    }
-
-    void update(Case& c) override {
-        // comportement spécifique, facultatif
-    }
-
-    Ressource* clone() const override {
-        return new Eau(*this);
-    }
-
-    // Auto-enregistrement
-    static inline AutoRegisterRessource<Eau> reg{RessourceType::EAU};
-    static inline AutoRegisterInfo<Eau> info{
-        RessourceType::EAU,
-        RessourceInfo{
-            "Eau",
-            20,
-            textures_file + "eau.jpg" // pas utilisé pour l'instant mais si on veux ajouter un system de visualisation de case ou d'inventaire ca peux etre sympa
-        }
-    };
+    static AutoRegisterRessource<Eau> reg;
+    static AutoRegisterInfo<Eau> info;
 };
 
 #endif

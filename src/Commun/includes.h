@@ -53,4 +53,10 @@ extern std::string world_file;
 extern std::string police_source;
 
 
+struct pair_hash {// merci chat
+    std::size_t operator()(const std::pair<int, int>& p) const {
+        return std::hash<int>()(p.first) ^ (std::hash<int>()(p.second) << 1);
+    }
+};
+
 #endif

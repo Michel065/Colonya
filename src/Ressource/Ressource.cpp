@@ -1,5 +1,6 @@
 #include "Ressource.h"
 #include "../Map/Case.h"
+#include "../Entite/Entite.h"
 
 Ressource::Ressource(const Ressource& other)
     : type(other.get_type()), utilisations(other.get_nbr_utilisation()) {}
@@ -41,7 +42,16 @@ void Ressource::set_time_manager(TimeManager* time){
     time_manager=time;
 }
 
-
+std::vector<Action> Ressource::get_actions_disponibles() {
+    std::vector<Action> actions;
+    actions.emplace_back(
+        "consommer " + get_name(),
+        [this](Entite& ent) {
+            this->consommer(ent);
+        }
+    );
+    return actions;
+}
 
 
 

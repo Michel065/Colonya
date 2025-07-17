@@ -17,7 +17,11 @@ public:
         score_boost = 0;
     }
 
-    void update(Case& c) const override {}
+    void update(Case& c) const override {
+        if(!c.get_ressource()){
+            
+        }
+    }
 
     Terrain* clone() const override { return new Defaut(*this); }
 

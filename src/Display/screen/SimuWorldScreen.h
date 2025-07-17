@@ -5,6 +5,7 @@
 #include "Screen.h"
 #include "../tool/Tool.h"
 #include "../tool/Button.h"
+#include "../tool/Popup_Case.h"
 
 #include "../../Simu/Simu.h"
 #include "../../Map/Map.h"
@@ -15,6 +16,7 @@ class SimuWorldScreen : public Screen {
 private:
     std::vector<Tool*> tools;
     Button* stop_button;
+    Popup_Case* popup_case;
 
     Simulation* simulation = nullptr;
     MapManager* map_manager = nullptr;
@@ -40,6 +42,8 @@ private:
     std::pair<int, int> visu_to_monde(float dx, float dy) const;
     std::vector<std::pair<int, int>> calcul_chunks_visibles();
 
+    Case* get_case_from_carte_with_coord_world(int world_x,int world_y) const;
+    Case* get_case_from_carte_with_coord_visuel(float dx,float dy) const;
 
     //pour le draw
     std::vector<sf::Texture*> liste_textures;
@@ -53,14 +57,14 @@ private:
     void update_case_size();
     void update();
     sf::Vector2f conv_coord_visuel_en_coord_pixel(float case_x, float case_y) const;
-    //sf::Vector2f conv_coord_pixel_en_coord_visuel(sf::Vector2f pos_pixel) const;
+    sf::Vector2f conv_coord_pixel_en_coord_realative_au_centre(sf::Vector2f pos_pixel) const;
 
 
     //draw local
     void draw_fond(sf::RenderWindow& window) const;
-    void draw_case(sf::RenderWindow& window,std::string name_texture,float x,float y)const;
+    void draw_case_fond(sf::RenderWindow& window,std::string name_texture,float x,float y)const;
+    void draw_case_structure(sf::RenderWindow& window, Structure* s, float x, float y) const;
 
-    std::string get_texture_from_carte(float dx,float dy) const;
 
 
 public:

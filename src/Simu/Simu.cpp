@@ -1,39 +1,53 @@
 #include "Simu.h"
 
-//les starteurs
-void start_Time_Manager(TimeManager &tm) {
+// Instance unique
+Simulation* Simulation::instance = nullptr;
+
+// Starters
+void start_Time_Manager(TimeManager& tm) {
     std::thread timeThread([&tm]() {
         tm.start();
     });
-
     timeThread.detach();
 }
 
-void start_Map_Manager(MapManager &mm) {
+void start_Map_Manager(MapManager& mm) {
     std::thread Map_Manaher_Thread([&mm]() {
         mm.start();
     });
-
     Map_Manaher_Thread.detach();
 }
 
-
-
-
-
-//la simu
-
+// Constructeur privé
 Simulation::Simulation(std::string name, NoiseParam* param_generator)
     : name(name), param_generator(param_generator) {}
 
 Simulation::~Simulation() {
-    if(simu_state==SimulationState::Running){
+    if (simu_state == SimulationState::Running) {
         stop();
     }
-    if(time_manager)delete time_manager;
-    if(map_manager)delete map_manager;
+    if (time_manager) delete time_manager;
+    if (map_manager) delete map_manager;
 }
 
+// Méthodes singleton
+void Simulation::create(std::string name, NoiseParam* param_generator) {
+    if (!instance)
+        instance = new Simulation(name, param_generator);
+    else
+        print_error("Simulation déjà créée !");
+}
+
+Simulation* Simulation::get_instance() {
+    return instance;
+}
+
+void Simulation::destroy() {
+    delete instance;
+    instance = nullptr;
+}
+
+// Logique de simulation
 bool Simulation::start() {
     print_primaire("Lancement Simulation (Monde:", name, ").");
     simu_state = SimulationState::Starting;
@@ -44,7 +58,6 @@ bool Simulation::start() {
     start_Map_Manager(*map_manager);
 
     sf::sleep(sf::seconds(2));
-
     carte = map_manager->get_map();
 
     if (carte != nullptr) {
@@ -69,10 +82,9 @@ SimulationState Simulation::get_state() {
     return simu_state;
 }
 
-std::string Simulation::get_name(){
+std::string Simulation::get_name() {
     return name;
 }
-
 
 void Simulation::set_time_speed(int timespeed) {
     if (time_manager) time_manager->setTimeSpeed(timespeed);

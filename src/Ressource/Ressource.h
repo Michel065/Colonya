@@ -2,13 +2,17 @@
 #define _RESSOURCE_H 
 
 #include "../Commun/includes.h"
+#include "../Tool/Action.h"
+
 #include "../Synchronisation/TimeManager.h"
 
 #include "./RessourceType.h"
 #include "./RessourceInfoManager.h"
-#include "../Entite/Entite.h"
+
 
 struct Case;
+class Entite;
+
 
 class Ressource {
 protected:
@@ -32,7 +36,8 @@ public:
     std::string get_name()const;
     RessourceInfo& get_info();
 
-    virtual void consommer(Entite* ent,Case& c) = 0;
+    std::vector<Action> get_actions_disponibles();
+    virtual void consommer(Entite& ent) = 0;
     virtual bool doit_etre_supprimee() const;
     virtual void update(Case& c) = 0;
 

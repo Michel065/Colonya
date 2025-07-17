@@ -27,6 +27,12 @@ void MapManager::init_map_contexte_file(NoiseParam* param_generator) {
     if(!param_generator)contexte.param=new NoiseParam();
     else contexte.param=param_generator;
 
+    generateur=new MapGenerator(contexte.param);
+    int x=contexte.chunk_spawn.first,y=contexte.chunk_spawn.second;
+    std::pair<int, int> coord_spwan=create_chunk_spawn(x,y);
+    print_primaire("coord:",coord_spwan.first,"x",coord_spwan.second);
+    contexte.coord_spawn=coord_spwan;
+
     json contexte_json = contexte; 
     std::ofstream file(world_file+"/"+world_contexte_name);
     file << contexte_json.dump(4);
@@ -39,6 +45,7 @@ void MapManager::save_map_contexte() {
     MapContexte contexte;
     contexte.chunks=carte.get_all_chunk_keys();
     contexte.chunk_spawn=carte.get_chunk_spawn();
+    contexte.coord_spawn=carte.get_coord_spawn();
     if(generateur)contexte.param=generateur->get_param();
     else contexte.param=new NoiseParam();
 
@@ -53,7 +60,7 @@ void MapManager::load_map_contexte() {
     print_status(true,"load map contexte");
     std::string path=world_file+"/"+world_contexte_name;
     if (!fs::exists(path) || fs::is_empty(path)) {
-        print("Aucun map contexte détecté. Initialisation de Map manager avec les valeur apr defaut.");
+        print_error("Aucun map contexte détecté. Initialisation de Map manager avec les valeur apr defaut.");
         generateur=new MapGenerator(new NoiseParam);
         return;
     }
@@ -64,9 +71,12 @@ void MapManager::load_map_contexte() {
     MapContexte contexte= contexte_json.get<MapContexte>();
 
     //cas ou tout va bien
-    generateur=new MapGenerator(contexte.param,chunk_spawn);
+    generateur=new MapGenerator(contexte.param);
     carte.set_chunk_spawn(contexte.chunk_spawn);
-    load_chunk(contexte.chunk_spawn.first, contexte.chunk_spawn.second);
+    carte.set_coord_spawn(contexte.coord_spawn);
+    int x=contexte.chunk_spawn.first,y=contexte.chunk_spawn.second;
+    load_chunk(x, y);
+
     load_all_chunk_from_liste(contexte.chunks);
     print_status(false,"load map contexte");
 }
@@ -171,7 +181,17 @@ void MapManager::create_chunk(int x, int y){
         carte.create_json_chunk(*ch);
     }
     else print_secondaire_attention("chunk "+std::to_string(x)+"x"+std::to_string(y)+" existe deja creation annule");
+}
 
+std::pair<int, int> MapManager::create_chunk_spawn(int x, int y) {
+    if (!chunk_existe(x, y)) {
+        auto [ch, coord_spawn] = generateur->generate_spawn(x, y);
+        carte.create_json_chunk(*ch);
+        return coord_spawn;
+    } else {
+        print_secondaire_attention("chunk " + std::to_string(x) + "x" + std::to_string(y) + " existe deja creation annule");
+    }
+    return {0, 0};
 }
 
 void MapManager::load_chunk(int x, int y){

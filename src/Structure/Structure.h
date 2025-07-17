@@ -29,6 +29,8 @@ public:
 
     //recup en rappor avec les info fixe
     std::string get_texture();
+    int get_taille_x();
+    int get_taille_y();
     std::string get_name()const;
     StructureInfo& get_info();
     
@@ -38,6 +40,8 @@ public:
     virtual void from_json(nlohmann::json json) = 0;
     virtual void set_from_structure(const Structure& other) = 0;// a voir mais pas forcent utile a sup peux etre
     virtual std::string get_print_string()const = 0;
+    virtual std::vector<Action> get_actions_disponibles(Entite& e) = 0;
+
 
 
     virtual Structure* clone() const = 0;

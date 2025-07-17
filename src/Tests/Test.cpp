@@ -430,63 +430,72 @@ void test_display(){
 void test_simulation() {
     print_status(true, "test_simulation");
 
-    // Générateur de bruit vide pour test (nullptr ou à adapter si obligatoire)
-    Simulation simu("001");
+    // 🔹 Création de la simulation via la méthode statique
+    Simulation::create("001");
+    Simulation* simu = Simulation::get_instance();
+
+    if (!simu) {
+        print_error("Échec de l'initialisation de la simulation.");
+        return;
+    }
 
     print_secondaire("Simulation initialisée.");
-    bool ok = simu.start();
+    bool ok = simu->start();
 
     if (!ok) {
         print_error("Échec du démarrage de la simulation.");
+        Simulation::destroy();
         return;
     }
 
     print_primaire("Simulation lancée. Attente de l'état 'Running'...");
 
-    // Attente active de l'état Running (max 2 secondes)
-    SimulationState state = simu.get_state();
-    
+    SimulationState state = simu->get_state();
 
     if (state != SimulationState::Running) {
         print_error("État 'Running' non atteint.");
+        Simulation::destroy();
         return;
     }
+
     print_primaire("Simulation prête.");
 
     // Pause
     print_secondaire("Pause de la simulation...");
-    simu.pause();
+    simu->pause();
     sf::sleep(sf::milliseconds(300));
     print_secondaire("Reprise de la simulation...");
-    simu.reprise();
+    simu->reprise();
 
-    // Modification vitesse
+    // Changement vitesse
     print_secondaire("Changement vitesse temps à 10 ticks/sec");
-    simu.set_time_speed(10);
+    simu->set_time_speed(10);
     sf::sleep(sf::milliseconds(300));
 
     // Accès aux composants
-    if (simu.get_carte()) print_test("Carte disponible.");
-    if (simu.get_time_manager()) print_test("TimeManager OK.");
-    if (simu.get_map_manager()) print_test("MapManager OK.");
+    if (simu->get_carte()) print_test("Carte disponible.");
+    if (simu->get_time_manager()) print_test("TimeManager OK.");
+    if (simu->get_map_manager()) print_test("MapManager OK.");
 
     // Attente quelques ticks
     print_secondaire("Attente 5 ticks...");
-    simu.get_time_manager()->wait_ticks(5);
-    print_test("Date actuelle : ", simu.get_time_manager()->get_date());
+    simu->get_time_manager()->wait_ticks(5);
+    print_test("Date actuelle : ", simu->get_time_manager()->get_date());
 
     // Stop
     print_secondaire("Arrêt de la simulation...");
-    bool stoppe = simu.stop();
+    bool stoppe = simu->stop();
 
     if (stoppe)
         print_primaire("Simulation arrêtée avec succès.");
     else
         print_error("Erreur lors de l'arrêt de la simulation.");
 
+    // 🔻 Destruction explicite de l'instance unique
+    Simulation::destroy();
+
     print_status(false, "test_simulation");
 }
-
 
 #include "../Display/tool/CalculateurDeRecouvrement.h"
 

@@ -4,10 +4,10 @@
 #include "../Terrain.h"
 #include "../TerrainManager.h"
 
-class Plaine : public Terrain {
+class Terre : public Terrain {
 public:
-    Plaine() {
-        name = "plaine";
+    Terre() {
+        name = "terre";
         texture = "terre.png";
         walkable = true;
         contructible = true;
@@ -21,10 +21,10 @@ public:
         // logique spécifique si tu veux, sinon vide
     }
 
-    Terrain* clone() const override { return new Plaine(*this); }
+    Terrain* clone() const override { return new Terre(*this); }
 
 private:
-    static inline AutoRegisterTerrain<Plaine> _reg{"plaine"};
+    static inline AutoRegisterTerrain<Terre> _reg{"terre"};
 
 };
 

@@ -15,10 +15,18 @@ public:
         hum_target = 0.85f;
         is_natural = true;
         score_boost = 1.2f;
+        ressource_par_defaut=RessourceType::EAU;
+        terrain_apres_evolution="sable";
+    }
+
+    std::string get_terrain_apres_evolution() const override {
+        return terrain_apres_evolution;
     }
 
     void update(Case& c) const override {
-        // logique spécifique si tu veux, sinon vide
+        if(!c.get_ressource()){
+            c.set_terrain_doit_evoluer(true);
+        }
     }
 
     Terrain* clone() const override { return new Eau_Terrain(*this); }
