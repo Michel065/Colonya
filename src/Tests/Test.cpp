@@ -251,7 +251,7 @@ void test_ressource_manager() {
         for(int i=0;i<20;i++){
             c.update();
             tmp = c.get_ressource();
-            if(tmp)tmp->consommer(&ent,c);
+            if(tmp)tmp->consommer(ent);
             else print_error("Pas de ressource dans la case ressource.");
             c.update();
         }
@@ -497,7 +497,29 @@ void test_simulation() {
     print_status(false, "test_simulation");
 }
 
-#include "../Display/tool/CalculateurDeRecouvrement.h"
+void test_entite() {
+    print_status(true, "test_entite");
+
+    Simulation::create("001");
+    Simulation* simu = Simulation::get_instance();
+
+    Entite* e = new Entite("TestEntity");
+    
+    e->set_map_manager(simu->get_map_manager());
+    e->set_time_manager(simu->get_time_manager());
+
+    int x = 5;
+    int y = 5;
+    
+    e->set_position(x,y);
+    
+    print(e->get_name());
+
+    delete e;
+    print_status(false, "test_entite");
+
+}
+
 
 int main_test(){
     print_primaire("!!! MODE TEST !!!");

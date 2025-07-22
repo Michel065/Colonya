@@ -30,7 +30,10 @@ int MenuScreen::handle_click(sf::Vector2f mouse_pos, DisplayManager* manager) {
                 if (label == "New") {
                     if (manager) manager->set_screen(Screen_enum::NewMap);
                 } else if (label == "Load") {
-                    if (manager) manager->set_screen(Screen_enum::LoadMap);
+                    if (manager){
+                        manager->actualise_screen_load();
+                        manager->set_screen(Screen_enum::LoadMap);
+                    }
                 } else if (label == "Exit") {
                     if (manager) manager->close();
                 }

@@ -14,13 +14,16 @@ LoadWorldScreen::LoadWorldScreen(const sf::Font& font)
     tools.push_back(new Button("Load", font, {x + 150, WINDOW_HEIGHT - 80}, {BUTTON_WIDTH, BUTTON_HEIGHT}));
     tools.push_back(new Button("Supprimer", font, {WINDOW_WIDTH - BUTTON_WIDTH, 80}, {BUTTON_WIDTH, BUTTON_HEIGHT},sf::Color(200, 50, 50)));
 
-    // Charger les mondes et peupler la liste
-    charger_mondes();
+    // Charger les mondes
+    //charger_mondes();
 }
 
 void LoadWorldScreen::charger_mondes() {
-    liste_boutons.clear();
-    liste_boutons.reset_index();
+    if (!fs::exists(worlds_file)) {
+        print_secondaire_attention("Aucun monde à charger!");
+        return;
+    }
+    liste_boutons.clean_liste();
     for (const auto& entry : fs::directory_iterator(worlds_file)) {
         if (entry.is_directory()) {
             liste_boutons.add_label(entry.path().filename().string());

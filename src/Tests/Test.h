@@ -24,6 +24,9 @@
 //simu
 #include "../Simu/Simu.h"
 
+//test entité
+#include "../Entite/Entite.h"
+
 int main_test();
 
 #endif

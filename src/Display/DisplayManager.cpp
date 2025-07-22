@@ -8,7 +8,8 @@ DisplayManager::DisplayManager()
 
     screens.push_back(new MenuScreen(font));
     screens.push_back(new NewWorldScreen(font));
-    screens.push_back(new LoadWorldScreen(font));
+    screen_de_load=new LoadWorldScreen(font);
+    screens.push_back(screen_de_load);
     screen_de_la_simu=new SimuWorldScreen(font);
     screens.push_back(screen_de_la_simu);
 }
@@ -80,6 +81,10 @@ void DisplayManager::set_screen(Screen_enum new_screen) {
 
 void DisplayManager::set_simu_in_simu_screen(Simulation*simu){
     screen_de_la_simu->set_simulation(simu,this);
+}
+
+void DisplayManager::actualise_screen_load(){
+    screen_de_load->charger_mondes();
 }
 
 void DisplayManager::draw_loading_screen() {

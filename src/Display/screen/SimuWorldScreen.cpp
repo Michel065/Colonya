@@ -21,7 +21,10 @@ SimuWorldScreen::~SimuWorldScreen() {
 }
 
 void SimuWorldScreen::set_simulation(Simulation* simu, DisplayManager* manager) {
-    if (simulation) delete simulation;
+    if (!simulation) {
+        print_error("simulation non transmise a simu world screen");
+        delete simulation;
+    }
     simulation = simu;
     if (!simulation->start()) {
         print_error("Échec du démarrage de la simulation (", simulation->get_name(), "). Retour au menu.");

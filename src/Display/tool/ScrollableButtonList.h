@@ -27,7 +27,9 @@ public:
     void handle_click(sf::Vector2f mouse_pos);
 
     void clear();
+    void clear_label();
     void reset_index();
+    void clean_liste();
 
     std::vector<Tool*>& get_tools();
     std::string get_selected_label() const;

@@ -1,10 +1,9 @@
 #include "Simu.h"
 
-// Instance unique
 Simulation* Simulation::instance = nullptr;
 
-// Starters
 void start_Time_Manager(TimeManager& tm) {
+    print_secondaire("Création d'un tread Time_Manager");
     std::thread timeThread([&tm]() {
         tm.start();
     });
@@ -12,25 +11,28 @@ void start_Time_Manager(TimeManager& tm) {
 }
 
 void start_Map_Manager(MapManager& mm) {
+    print_secondaire("Création d'un tread Map_Manager");
     std::thread Map_Manaher_Thread([&mm]() {
         mm.start();
     });
     Map_Manaher_Thread.detach();
 }
 
-// Constructeur privé
 Simulation::Simulation(std::string name, NoiseParam* param_generator)
-    : name(name), param_generator(param_generator) {}
+    : name(name), param_generator(param_generator) {
+    print_secondaire("Simulation Créer (", name, ")");
+}
 
 Simulation::~Simulation() {
     if (simu_state == SimulationState::Running) {
         stop();
     }
+    print_secondaire("Simulation Supprimée (", name, ")");
     if (time_manager) delete time_manager;
     if (map_manager) delete map_manager;
+    carte = nullptr;
 }
 
-// Méthodes singleton
 void Simulation::create(std::string name, NoiseParam* param_generator) {
     if (!instance)
         instance = new Simulation(name, param_generator);
@@ -39,15 +41,22 @@ void Simulation::create(std::string name, NoiseParam* param_generator) {
 }
 
 Simulation* Simulation::get_instance() {
-    return instance;
+    print_secondaire("Simulation::get_instance appelé");
+    if(instance){
+        return instance;
+    }else{
+        print_error("Instance non initialisé (Récuperation intance simulation)");
+        return nullptr;
+    }
 }
 
 void Simulation::destroy() {
-    delete instance;
+    if(instance){
+        delete instance;
+    }
     instance = nullptr;
 }
 
-// Logique de simulation
 bool Simulation::start() {
     print_primaire("Lancement Simulation (Monde:", name, ").");
     simu_state = SimulationState::Starting;
@@ -61,10 +70,12 @@ bool Simulation::start() {
     carte = map_manager->get_map();
 
     if (carte != nullptr) {
+        print_secondaire("Simulation::start() carte chargée");
         simu_state = SimulationState::Running;
         return true;
     }
 
+    print_secondaire_attention("Simulation::start() carte non chargée");
     return false;
 }
 

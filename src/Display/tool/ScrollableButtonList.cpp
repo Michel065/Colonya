@@ -92,6 +92,17 @@ void ScrollableButtonList::clear(){
     selected_button = nullptr;
 }
 
+
+void ScrollableButtonList::clear_label(){
+    labels.clear();
+}
+
 void ScrollableButtonList::reset_index(){
     page_index = 0;
+}
+
+void ScrollableButtonList::clean_liste(){
+    clear();
+    clear_label();
+    reset_index();
 }
