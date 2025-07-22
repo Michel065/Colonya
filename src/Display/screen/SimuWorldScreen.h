@@ -52,6 +52,8 @@ private:
     float pixels_par_case_y=0;
     
     void init_sprites();
+    void reset_simu_world();
+
     sf::Vector2f calcul_scale_sprite() const;
     void update_sprites_scale();
     void update_case_size();

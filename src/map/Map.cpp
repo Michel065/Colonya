@@ -1,5 +1,9 @@
 #include "Map.h"
 
+Map::~Map(){
+    deload_all_chunk();
+}
+
 std::pair<int, int> Map::get_chunk_coords(int world_x, int world_y) const {
     int cx = world_x / CHUNK_SIZE;
     int cy = world_y / CHUNK_SIZE;
@@ -201,6 +205,14 @@ void Map::decharge_chunk_pas_utilise() {
         deload_chunk(coord_x, coord_y);
     }
 }
+
+void Map::deload_all_chunk() {
+    for (auto& [coord, chunk] : loaded_chunks) {
+        if (chunk) delete chunk;
+    }
+    loaded_chunks.clear();
+}
+
 
 void Map::set_coord_spawn(std::pair<int, int> coord_spaw){
     coord_spawn=coord_spaw;
