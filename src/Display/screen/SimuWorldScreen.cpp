@@ -20,8 +20,25 @@ SimuWorldScreen::~SimuWorldScreen() {
     for (auto& tx : liste_textures) delete tx;
 }
 
+void SimuWorldScreen::reset_simu_world() {
+    popup_case->fermer();
+    simulation = nullptr;
+    map_manager = nullptr;
+    carte = nullptr;
+    centre_case_x = 25;
+    centre_case_y = 25;
+    largeur_visible_case_demi = 6;
+    hauteur_visible_case_demi = 5;
+    chunks_utilises.clear();
+}
+
 void SimuWorldScreen::set_simulation(Simulation* simu, DisplayManager* manager) {
-    if (simulation) delete simulation;
+    reset_simu_world();
+    
+    if (!simu) {
+        print_error("simulation non transmise a simu world screen");
+    }
+    
     simulation = simu;
     if (!simulation->start()) {
         print_error("Échec du démarrage de la simulation (", simulation->get_name(), "). Retour au menu.");
@@ -48,30 +65,25 @@ void SimuWorldScreen::actualiser_chunks_utilises() {
     std::vector<std::pair<int, int>> a_deload;
     std::vector<std::pair<int, int>> a_load;
 
-    // Étape 1 : détecter les chunks à décharger
     for (const auto& [coords, chunk] : chunks_utilises) {
         if (std::find(nouveaux_chunks.begin(), nouveaux_chunks.end(), coords) == nouveaux_chunks.end()) {
             a_deload.push_back(coords);
         }
     }
     
-    // ⚠️ Étape 1.5 : suppression réelle des chunks inutiles
     for (const auto& coords : a_deload) {
         chunks_utilises.erase(coords);
     }
 
-    // Étape 2 : détecter les chunks à charger
     for (const auto& coords : nouveaux_chunks) {
         if (chunks_utilises.find(coords) == chunks_utilises.end()) {
             a_load.push_back(coords);
         }
     }
 
-    // Demander déchargement et chargement
     map_manager->demander_deload_chunk(a_deload, true); // true = sort du chunk
     std::vector<Chunk*> chunks_charges = map_manager->demander_load_chunk(a_load, true); // true = on entre dans le chunk
 
-    // Étape 3 : stocker les chunks réellement chargés
     for (std::size_t i = 0; i < a_load.size(); ++i) {
         if (chunks_charges[i]) {
             chunks_utilises[a_load[i]] = chunks_charges[i];
@@ -126,6 +138,7 @@ std::vector<std::pair<int, int>> SimuWorldScreen::calcul_chunks_visibles() {
 
 
 void SimuWorldScreen::draw_fond(sf::RenderWindow& window) const {
+    //print(carte->get_coord_spawn().first,"x",carte->get_coord_spawn().second);
     float x,y;
     for (int iy = -hauteur_visible_case_demi-1; iy <= hauteur_visible_case_demi; ++iy) {
         for (float decalage = 0; decalage <=0.5 ; decalage+=0.5) {

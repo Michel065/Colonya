@@ -24,6 +24,13 @@
 //simu
 #include "../Simu/Simu.h"
 
+//test entité
+#include "../Entite/Entite.h"
+
+//test_MemoireIAEncoder
+#include "../Entite/Tool/MemoireIAEncoder.h"
+
+
 int main_test();
 
 #endif

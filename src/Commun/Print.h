@@ -3,12 +3,12 @@
 
 #define PRINT_primaire true
 #define PRINT_secondaire true
-#define PRINT_secondaire_attention false
+#define PRINT_secondaire_attention true
 #define PRINT_test true
 #define PRINT_error true
 #define PRINT_status true
 
-// Couleurs ANSI
+// Couleurs
 #define COLOR_GREEN   "\033[32m"
 #define COLOR_ORANGE  "\033[38;5;208m"  // orange 
 #define COLOR_PINK    "\033[35m"

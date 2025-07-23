@@ -2,10 +2,10 @@
 #define ENTITE_H 
 
 #include "../Commun/includes.h"
-#include "../Tool/Action.h"
+#include "./Tool/Action.h"
 #include "../Tool/Stockage.h"
 
-#include "Observation.h"
+#include "./Tool/Observation.h"
 
 class Case;
 class Chunk;
@@ -73,8 +73,8 @@ public:
     void update_sleep();
     void set_sleep_provider(Habitation* hab);
 
-    virtual void update() = 0;
-    virtual void draw(sf::RenderWindow& window) const = 0;
+    virtual void update();
+    virtual void draw(sf::RenderWindow& window) const;
 
     void run();
 
@@ -86,7 +86,7 @@ public:
     std::vector<Action> action_disponible_avec_ressource_inventaire();
     std::map<std::string, std::pair<int, int>> calculer_action_deplacement() const;
     
-    virtual Action prise_de_decision(const std::vector<Action>& actions) = 0;
+    virtual Action prise_de_decision(const std::vector<Action>& actions);
 
     const std::unordered_map<std::pair<int, int>, Chunk*, pair_hash>& get_chunks_utilises() const;
 

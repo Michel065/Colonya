@@ -67,6 +67,7 @@ void Entite::boire(int val) {soif = std::min(soif.load() + val, soif_max);}
 void Entite::set_position(int x, int y) {
     pos_x = x;
     pos_y = y;
+    
 }
 
 std::pair<int, int> Entite::get_position() const {return { pos_x, pos_y };}
@@ -320,4 +321,21 @@ bool Entite::ajouter_inventaire(Ressource* res){
 
 bool Entite::retirer_type_inventaire(RessourceType type,Ressource* res){
     return inventaire.retirer_type(type,res);
+}
+
+
+// rendre les virtuelle en pas pure
+void Entite::update() {
+    print_secondaire("l'entite a voulue update");
+}
+
+void Entite::draw(sf::RenderWindow& window) const {
+    print_secondaire("l'entite a voulue draw");
+}
+
+Action Entite::prise_de_decision(const std::vector<Action>& actions) {
+    print_secondaire("l'entite a voulue faire une action");
+    if (!actions.empty())
+        return actions[0];
+    return Action();  
 }

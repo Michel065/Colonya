@@ -22,18 +22,16 @@ private:
     MapManager* map_manager = nullptr;
     TimeManager* time_manager = nullptr;
 
-    // 🔒 Constructeur privé interdit les new externes
+    // Constructeur privé 
     Simulation(std::string name, NoiseParam* param_generator = nullptr);
 
 public:
     ~Simulation();
-
-    // 🔹 Création/accès unique à l'instance
+    
     static void create(std::string name, NoiseParam* param_generator = nullptr);
     static Simulation* get_instance();
     static void destroy();
 
-    // ⏯️ Méthodes normales
     bool start();
     bool stop();
 

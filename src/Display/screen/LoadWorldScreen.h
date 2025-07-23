@@ -12,7 +12,6 @@
 
 class LoadWorldScreen : public Screen {
 private:
-    void charger_mondes();
     void delete_mondes(std::string name);
     
     std::vector<Tool*> tools;
@@ -21,6 +20,8 @@ private:
 
 public:
     LoadWorldScreen(const sf::Font& font);
+    
+    void charger_mondes();
     void draw(sf::RenderWindow& window) const override;
     int handle_click(sf::Vector2f mouse_pos, DisplayManager* manager) override;
     void handle_event(const sf::Event& event) override;

@@ -32,8 +32,17 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 clean:
 	rm -rf $(BUILD_DIR) main
 
+# w pour les mondes
+cw:
+	rm -r ./src/Worlds
+
 c:
-	rm -rf $(BUILD_DIR) main
+	rm -rf $(BUILD_DIR) main 
+
+# a pour all
+ca: 
+	rm -rf $(BUILD_DIR) main 
+	rm -r ./src/Worlds
 
 run: main
 	./main

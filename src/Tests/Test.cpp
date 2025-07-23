@@ -251,7 +251,7 @@ void test_ressource_manager() {
         for(int i=0;i<20;i++){
             c.update();
             tmp = c.get_ressource();
-            if(tmp)tmp->consommer(&ent,c);
+            if(tmp)tmp->consommer(ent);
             else print_error("Pas de ressource dans la case ressource.");
             c.update();
         }
@@ -497,7 +497,78 @@ void test_simulation() {
     print_status(false, "test_simulation");
 }
 
-#include "../Display/tool/CalculateurDeRecouvrement.h"
+void test_entite() {
+    print_status(true, "test_entite");
+
+    Simulation::create("001");
+    Simulation* simu = Simulation::get_instance();
+
+    Entite* e = new Entite("TestEntity");
+    
+    e->set_map_manager(simu->get_map_manager());
+    e->set_time_manager(simu->get_time_manager());
+
+    int x = 5;
+    int y = 5;
+    
+    e->set_position(x,y);
+    
+    print(e->get_name());
+
+    delete e;
+    print_status(false, "test_entite");
+
+}
+
+void test_MemoireIAEncoder() {
+    print_status(true, "test_MemoireIAEncoder");
+
+    MemoireIAEncoder encoder(worlds_file+"/001/Creature", "creature_test");
+
+    // Ajout d'encodages d'action
+    for (int i = 0; i < 10; ++i) {
+        std::string nom = "action_" + std::to_string(i);
+        std::vector<float> features(17, 0.0f);
+        features[i % features.size()] = 1.0f; // Une seule feature dominante
+
+        encoder.update_action_encoding(nom, features);
+    }
+
+    // Ajout d'effets d'observations
+    for (int i = 0; i < 10; ++i) {
+        std::string label = "label_" + std::to_string(i);
+        std::vector<float> effects = {
+            static_cast<float>(i % 3 == 0),
+            static_cast<float>(i % 3 == 1),
+            static_cast<float>(i % 3 == 2)
+        };
+
+        encoder.update_label_effect(label, effects);
+    }
+
+    encoder.save_to_json();
+
+    MemoireIAEncoder encoder_loaded(worlds_file+"/001/Creature", "creature_test");
+
+    std::cout << "\n--- Actions enregistrées ---\n";
+    for (const auto& pair : encoder_loaded.get_encodage_action_map()) {
+        std::cout << pair.first << " : ";
+        for (float v : pair.second) std::cout << v << " ";
+        std::cout << "\n";
+    }
+
+    std::cout << "\n--- Observations enregistrées ---\n";
+    for (const auto& pair : encoder_loaded.get_label_effect_map()) {
+        std::cout << pair.first << " : ";
+        for (float v : pair.second) std::cout << v << " ";
+        std::cout << "\n";
+    }
+
+
+    print_status(false, "test_MemoireIAEncoder");
+}
+
+
 
 int main_test(){
     print_primaire("!!! MODE TEST !!!");

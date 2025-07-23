@@ -2,7 +2,7 @@
 #define _RESSOURCE_H 
 
 #include "../Commun/includes.h"
-#include "../Tool/Action.h"
+#include "../Entite/Tool/Action.h"
 
 #include "../Synchronisation/TimeManager.h"
 

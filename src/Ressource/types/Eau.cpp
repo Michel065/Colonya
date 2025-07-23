@@ -19,7 +19,7 @@ AutoRegisterRessource<Eau> Eau::reg{RessourceType::EAU};
 AutoRegisterInfo<Eau> Eau::info{
     RessourceType::EAU,
     RessourceInfo{
-        "Eau",
+        "eau",
         20,
         textures_file + "eau.jpg"
     }

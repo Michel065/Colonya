@@ -6,7 +6,7 @@
 #include "../Terrain/TerrainManager.h"
 #include "../Ressource/RessourceManager.h"
 #include "../Structure/StructureManager.h"
-#include "../Tool/Action.h"
+#include "../Entite/Tool/Action.h"
 
 class Case {
 private:
