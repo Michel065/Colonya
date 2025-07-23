@@ -2,10 +2,10 @@
 #define ENTITE_H 
 
 #include "../Commun/includes.h"
-#include "../Tool/Action.h"
+#include "./Tool/Action.h"
 #include "../Tool/Stockage.h"
 
-#include "Observation.h"
+#include "./Tool/Observation.h"
 
 class Case;
 class Chunk;

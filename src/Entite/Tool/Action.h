@@ -1,7 +1,7 @@
 #ifndef ACTION_H
 #define ACTION_H
 
-#include "../Commun/includes.h"
+#include "../../Commun/includes.h"
 
 class Entite;
 class Case;
